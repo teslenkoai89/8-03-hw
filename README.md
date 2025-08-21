@@ -30,7 +30,7 @@
 На проверку направить скриншот с командой и результатом ее выполнения<br><br>
 
 Скриншоты<br>
-![Screen](https://github.com/teslenkoai89/8-03-hw/blob/rsync/rsync-example-1.JPG)
+![Screen](https://github.com/teslenkoai89/8-03-hw/blob/rsync/rsync-example--1.JPG)
 
 ---
 
