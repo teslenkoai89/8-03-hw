@@ -34,7 +34,8 @@
 Скриншоты<br>
 ![Сеть VM1](https://github.com/teslenkoai89/8-03-hw/blob/firewall/VM1.JPG)
 ![Сеть VM2](https://github.com/teslenkoai89/8-03-hw/blob/firewall/VM2.JPG)
-
+![Iptables VM1](https://github.com/teslenkoai89/8-03-hw/blob/firewall/VM1-iptables-rules.JPG)
+![Iptables VM2](https://github.com/teslenkoai89/8-03-hw/blob/firewall/VM2-Iptables-rules.JPG)
 ---
 
 ### Задание 2
