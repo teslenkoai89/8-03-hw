@@ -44,11 +44,10 @@
 4 На проверку направьте конфигурационный файл haproxy, скриншоты, где видно перенаправление запросов на разные серверы при обращении к HAProxy c использованием домена example.local и без него.<br>
 <br>
 
-https://github.com/teslenkoai89/8-03-hw/blob/main/haproxy-example-2-2.cfg
+https://github.com/teslenkoai89/8-03-hw/blob/main/haproxy-example-2-3.cfg
 
 Скриншоты<br>
-![Screen](https://github.com/teslenkoai89/8-03-hw/blob/main/haproxy-example-2.JPG)
-
+![Screen](https://github.com/teslenkoai89/8-03-hw/blob/main/haproxy-example-2-2.JPG)
 
 ---
 
