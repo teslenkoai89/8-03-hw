@@ -50,8 +50,6 @@ Iptables VM2<br>
 Требование к результату<br>
 К выполненной задаче добавьте скриншот настроек и успешное подключение через ssh.<br>
 
-https://github.com/teslenkoai89/8-03-hw/blob/main/haproxy-example-2-3.cfg
-
 Скриншоты<br>
 SSH<br>
 ![Screen](https://github.com/teslenkoai89/8-03-hw/blob/firewall/SSH-example-2.JPG)
