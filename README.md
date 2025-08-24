@@ -33,13 +33,13 @@
 
 Скриншоты<br>
 Сеть VM1<br>
-![Сеть VM1](https://github.com/teslenkoai89/8-03-hw/blob/firewall/VM1.JPG)
+![Сеть VM1](https://github.com/teslenkoai89/8-03-hw/blob/firewall/VM1.JPG)<br>
 Сеть VM2<br>
-![Сеть VM2](https://github.com/teslenkoai89/8-03-hw/blob/firewall/VM2.JPG)
+![Сеть VM2](https://github.com/teslenkoai89/8-03-hw/blob/firewall/VM2.JPG)<br>
 Iptables VM1<br>
-![Iptables VM1](https://github.com/teslenkoai89/8-03-hw/blob/firewall/VM1-iptables-rules.JPG)
+![Iptables VM1](https://github.com/teslenkoai89/8-03-hw/blob/firewall/VM1-iptables-rules.JPG)<br>
 Iptables VM2<br>
-![Iptables VM2](https://github.com/teslenkoai89/8-03-hw/blob/firewall/VM2-Iptables-rules.JPG)
+![Iptables VM2](https://github.com/teslenkoai89/8-03-hw/blob/firewall/VM2-Iptables-rules.JPG)<br>
 ---
 
 ### Задание 2
