@@ -32,7 +32,7 @@
 Прикреплен файл haproxy_example_1.cfg
 
 Скриншоты
-![Screen](https://github.com/teslenkoai89/8-03-hw/blob/main/screen_example_1.JPG)
+![URL](https://github.com/teslenkoai89/8-03-hw/blob/main/screen_example_1.JPG)
 
 ---
 
