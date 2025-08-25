@@ -18,6 +18,8 @@
 ![Сеть VM2](https://github.com/teslenkoai89/8-03-hw/blob/firewall/IP%20VM2.JPG)<br>
 Iptables VM1<br>
 ![Iptables VM1](https://github.com/teslenkoai89/8-03-hw/blob/firewall/Iptables%20VM1.JPG)<br>
+Sysctl<br>
+![Iptables VM1](https://github.com/teslenkoai89/8-03-hw/blob/firewall/sysctl.JPG)<br>
 
 ---
 
