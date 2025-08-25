@@ -50,5 +50,3 @@ https://github.com/teslenkoai89/8-03-hw/blob/main/haproxy-example-2-3.cfg
 ![Screen](https://github.com/teslenkoai89/8-03-hw/blob/main/haproxy-example-2-3.JPG)
 
 ---
-
-![Название скриншота](ссылка на скриншот)`
