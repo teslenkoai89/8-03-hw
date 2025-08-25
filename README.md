@@ -39,7 +39,7 @@ VM1<br>
 VM2<br>
 ![Screen](https://github.com/teslenkoai89/8-03-hw/blob/firewall/IP%20VM2.JPG)
 Iptables<br>
-![Screen](https://github.com/teslenkoai89/8-03-hw/blob/firewall/IPtables-vm1-example-2.JPG)
+![Screen](https://github.com/teslenkoai89/8-03-hw/blob/firewall/IPtables-vm1-ex2.JPG)
 
 
 ---
