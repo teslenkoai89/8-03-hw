@@ -33,11 +33,11 @@ Sysctl<br>
 
 Скриншоты<br>
 SSH<br>
-![Screen](https://github.com/teslenkoai89/8-03-hw/blob/firewall/SSH-example-2.JPG)
+![Screen](https://github.com/teslenkoai89/8-03-hw/blob/firewall/SSH.JPG)
 VM1<br>
-![Screen](https://github.com/teslenkoai89/8-03-hw/blob/firewall/VM1-example-2.JPG)
+![Screen](https://github.com/teslenkoai89/8-03-hw/blob/firewall/IP%20VM1.JPG)
 VM2<br>
-![Screen](https://github.com/teslenkoai89/8-03-hw/blob/firewall/VM2-example-2.JPG)
+![Screen](https://github.com/teslenkoai89/8-03-hw/blob/firewall/IP%20VM2.JPG)
 Iptables<br>
 ![Screen](https://github.com/teslenkoai89/8-03-hw/blob/firewall/IPtables-vm1-example-2.JPG)
 
