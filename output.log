@@ -1,0 +1,5786 @@
+0.0 0 0
+0
+UTC
+#
+#	>>>>>>>>>>      The program "newaliases" must be run after
+#	>> NOTE >>      this file is updated for any changes to
+#	>>>>>>>>>>      show through to MTA.
+#
+
+# Basic system aliases -- these MUST be present.
+MAILER-DAEMON:	postmaster
+abuse:		postmaster
+postmaster:	root
+
+# Person who should get root's mail.
+root:           user
+
+# Local system aliases
+ALT Server 11.0 (Mendelevium)
+# /etc/anacrontab: configuration file for anacron
+
+# See anacron(8) and anacrontab(5) for details.
+
+SHELL=/bin/sh
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+# These entries are useful for a ALT Linux system.
+1	5	cron.daily	run-anacronjobs /etc/cron.daily
+7	10	cron.weekly	run-anacronjobs /etc/cron.weekly
+30	15	cron.monthly	run-anacronjobs /etc/cron.monthly
+# /etc/bashrc: executed by ~/.bashrc for non-login shells.
+
+# Are we an interactive shell?
+if [ -z "${-##*i*}" ]; then
+	# Set PS1 if not yet.
+	if [ "$PS1" = '\s-\v\$ ' ]; then
+		PS1='[\u@\h \W]\$ '
+	fi
+
+	# Set funcy prompt_command if unset.
+	if [ "${PROMPT_COMMAND-PROMPT_COMMAND}" = PROMPT_COMMAND ]; then
+		case "$TERM" in
+			*xterm*|*rxvt*|*Eterm*)
+				PROMPT_COMMAND='echo -ne "\033]0;${USER}@${HOSTNAME%%.*}: ${PWD/#$HOME\//~/}\007"'
+				;;
+		esac
+	fi
+
+	# Source optional scripts.
+	for f in /etc/bashrc.d/*.sh; do
+		if [ -r "$f" ]; then
+			. "$f"
+		fi
+	done
+	unset f
+
+	if [ -n "$BASH" -a -n "$BASH_VERSION" ]; then
+		# Notify of job termination immediately.
+		set -b
+	fi
+fi
+# Copyright (C) Internet Systems Consortium, Inc. ("ISC")
+#
+# SPDX-License-Identifier: MPL-2.0
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, you can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# See the COPYRIGHT file distributed with this work for additional
+# information regarding copyright ownership.
+
+# The bind.keys file is used to override the built-in DNSSEC trust anchors
+# which are included as part of BIND 9.  The only trust anchors it contains
+# are for the DNS root zone (".").  Trust anchors for any other zones MUST
+# be configured elsewhere; if they are configured here, they will not be
+# recognized or used by named.
+#
+# To use the built-in root key, set "dnssec-validation auto;" in the
+# named.conf options, or else leave "dnssec-validation" unset.  If
+# "dnssec-validation" is set to "yes", then the keys in this file are
+# ignored; keys will need to be explicitly configured in named.conf for
+# validation to work.  "auto" is the default setting, unless named is
+# built with "configure --disable-auto-validation", in which case the
+# default is "yes".
+#
+# This file is NOT expected to be user-configured.
+#
+# Servers being set up for the first time can use the contents of this file
+# as initializing keys; thereafter, the keys in the managed key database
+# will be trusted and maintained automatically.
+#
+# These keys are current as of November 2024.  If any key fails to
+# initialize correctly, it may have expired. This should not occur if
+# BIND is kept up to date.
+#
+# See https://data.iana.org/root-anchors/root-anchors.xml for current trust
+# anchor information for the root zone.
+
+trust-anchors {
+        # This key (20326) was published in the root zone in 2017, and
+        # is scheduled to be phased out starting in 2025. It will remain
+        # in the root zone until some time after its successor key has
+        # been activated. It will remain this file until it is removed
+        # from the root zone.
+
+        . initial-key 257 3 8 "AwEAAaz/tAm8yTn4Mfeh5eyI96WSVexTBAvkMgJzkKTOiW1vkIbzxeF3
+                +/4RgWOq7HrxRixHlFlExOLAJr5emLvN7SWXgnLh4+B5xQlNVz8Og8kv
+                ArMtNROxVQuCaSnIDdD5LKyWbRd2n9WGe2R8PzgCmr3EgVLrjyBxWezF
+                0jLHwVN8efS3rCj/EWgvIWgb9tarpVUDK/b58Da+sqqls3eNbuv7pr+e
+                oZG+SrDK6nWeL3c6H5Apxz7LjVc1uTIdsIXxuOLYA4/ilBmSVIzuDWfd
+                RUfhHdY6+cn8HFRm+2hM8AnXGXws9555KrUB5qihylGa8subX2Nn6UwN
+                R1AkUTV74bU=";
+        # This key (38696) will be pre-published in the root zone in 2025
+        # and is scheduled to begin signing in late 2026. At that time,
+        # servers which were already using the old key (20326) should roll
+        # seamlessly to this new one via RFC 5011 rollover.
+        . initial-ds 38696 8 2 "683D2D0ACB8C9B712A1948B27F741219298D0A450D612C483AF444A
+        4C0FB2B16";
+};
+#
+# This file contains a list of port numbers between 600 and 1024,
+# which should not be used by bindresvport.  bindresvport is mostly
+# called by RPC services.  This mostly solves the problem, that a
+# RPC service uses a well known port of another service.
+#
+631	# cups
+636	# ldaps
+694	# ha-cluster
+749	# kerberos-adm
+750	# kerberos-iv
+774	# rpasswd
+873	# rsync
+901	# swat
+921	# lwresd
+992	# telnets
+993	# imaps
+994	# ircs
+995	# pops
+# SPDX-License-Identifier: LGPL-2.1-only
+#
+#  Copyright IBM Corporation. 2007
+#
+#  Authors:	Balbir Singh <balbir@linux.vnet.ibm.com>
+#
+#group daemons/www {
+#	perm {
+#		task {
+#			uid = root;
+#			gid = webmaster;
+#		}
+#		admin {
+#			uid = root;
+#			gid = root;
+#		}
+#	}
+#	cpu {
+#		cpu.shares = 1000;
+#	}
+#}
+#
+#group daemons/ftp {
+#	perm {
+#		task {
+#			uid = root;
+#			gid = ftpmaster;
+#		}
+#		admin {
+#			uid = root;
+#			gid = root;
+#		}
+#	}
+#	cpu {
+#		cpu.shares = 500;
+#	}
+#}
+#
+#mount {
+#	cpu = /mnt/cgroups/cpu;
+#	cpuacct = /mnt/cgroups/cpuacct;
+#}
+# /etc/cgrules.conf
+#The format of this file is described in cgrules.conf(5)
+#manual page.
+#
+# Example:
+#<user>		<controllers>	<destination>
+#@student	cpu,memory	usergroup/student/
+#peter		cpu		test1/
+#%		memory		test2/
+# End of file
+#cgsnapshot tool configuration file
+
+#memory
+memory.memsw.failcnt
+memory.memsw.limit_in_bytes
+memory.memsw.max_usage_in_bytes
+memory.swappiness
+memory.use_hierarchy
+memory.failcnt
+memory.soft_limit_in_bytes
+memory.limit_in_bytes
+memory.max_usage_in_bytes
+memory.move_charge_at_immigrate
+
+#cpu
+cpu.rt_runtime_us
+cpu.rt_period_us
+
+#cpuacct
+cpuacct.usage
+
+#devices
+devices.deny
+devices.allow
+devices.list
+
+#cpuset
+cpuset.memory_spread_slab
+cpuset.memory_spread_page
+cpuset.memory_migrate
+cpuset.sched_relax_domain_level
+cpuset.sched_load_balance
+cpuset.mem_hardwall
+cpuset.mem_exclusive
+cpuset.cpu_exclusive
+cpuset.mems
+cpuset.cpus
+
+#ns
+
+#freezer
+freezer.state
+
+#net_cls
+net_cls.classid
+
+#blkio
+blkio.weight#cgsnapshot tool configuration file
+
+#memory
+memory.oom_control
+
+#cpu
+
+#cpuacct
+
+#devices
+
+#cpuset
+
+#ns
+
+#freezer
+
+#net_cls
+
+#blkio# Use public servers from the pool.ntp.org project.
+# Please consider joining the pool (https://www.pool.ntp.org/join.html).
+pool pool.ntp.org iburst
+
+# Record the rate at which the system clock gains/losses time.
+driftfile /var/lib/chrony/drift
+
+# Allow the system clock to be stepped in the first three updates
+# if its offset is larger than 1 second.
+makestep 1.0 3
+
+# Enable kernel synchronization of the real-time clock (RTC).
+rtcsync
+
+# Enable hardware timestamping on all interfaces that support it.
+#hwtimestamp *
+
+# Increase the minimum number of selectable sources required to adjust
+# the system clock.
+#minsources 2
+
+# Allow NTP client access from local network.
+#allow 192.168.0.0/16
+
+# Serve time even if not synchronized to a time source.
+#local stratum 10
+
+# Require authentication (nts or key option) for all NTP sources.
+#authselectmode require
+
+# Specify file containing keys for NTP authentication.
+#keyfile /etc/chrony.keys
+
+# Save NTS keys and cookies.
+ntsdumpdir /var/lib/chrony
+
+# Insert/delete leap seconds by slewing instead of stepping.
+#leapsecmode slew
+
+# Set the TAI-UTC offset of the system clock.
+#leapseclist /usr/share/zoneinfo/leap-seconds.list
+
+# Specify directory for log files.
+logdir /var/log/chrony
+
+# Select which information is logged.
+#log measurements statistics tracking
+# Keys used by chronyd for command and NTP authentication
+# run-parts
+01 * * * * root run-parts /etc/cron.hourly
+02 4 * * * root run-parts /etc/cron.daily
+22 4 * * 0 root run-parts /etc/cron.weekly
+42 4 1 * * root run-parts /etc/cron.monthly
+#
+#
+#
+#minute (0-59),
+#|	hour (0-23),
+#|	|	day of the month (1-31),
+#|	|	|	month of the year (1-12),
+#|	|	|	|	day of the week (0-6 with 0=Sunday).
+#|	|	|	|	|	commands
+#!/bin/sh -euf
+
+# This file is not described by pam_env.conf(5).
+#
+# This file is directly sourced by the entry scripts of hasher(7) containers,
+# as well as /etc/profile.
+# It is recommended that this file be left unchanged to ease upgrades,
+# and any local additions go into /etc/profile.d/ directory.
+
+if [ "$(id -u)" -eq 0 ]; then
+	PATH="/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/sbin:/usr/local/bin"
+else
+	PATH="/usr/bin:/bin:/usr/local/bin"
+fi
+# A sample configuration for dhcpcd.
+# See dhcpcd.conf(5) for details.
+
+# Allow users of this group to interact with dhcpcd via the control socket.
+#controlgroup wheel
+
+# Inform the DHCP server of our hostname for DDNS.
+#hostname
+
+# To share the DHCP lease across OSX and Windows a ClientID is needed.
+# Enabling this may get a different lease than the kernel DHCP client.
+# Some upstream DHCP servers may also require a ClientID, such as FRITZ!Box.
+# Use the hardware address of the interface for the Client ID (default).
+#clientid
+# or
+# Use the same DUID + IAID as set in DHCPv6 for DHCPv4 ClientID as per RFC4361.
+# Some non-RFC compliant DHCP servers do not reply with this set.
+# In this case, comment out duid and enable clientid above.
+#duid
+
+# Persist interface configuration when dhcpcd exits.
+#persistent
+
+# vendorclassid is set to blank to avoid sending the default of
+# dhcpcd-<version>:<os>:<machine>:<platform>
+vendorclassid
+
+# A list of options to request from the DHCP server.
+option domain_name_servers, domain_name, domain_search
+option classless_static_routes
+# Respect the network MTU. This is applied to DHCP routes.
+option interface_mtu
+
+# Request a hostname from the network
+option host_name
+
+# Most distributions have NTP support.
+option ntp_servers
+
+# A ServerID is required by RFC2131.
+require dhcp_server_identifier
+
+# Generate SLAAC address using the Hardware Address of the interface
+#slaac hwaddr
+# OR generate Stable Private IPv6 Addresses based from the DUID
+slaac private
+
+# A hook script is provided to lookup the hostname if not set by the DHCP
+# server, but it should not be run by default.
+nohook lookup-hostname
+
+# Don't attempt to obtain an IPv4LL address if we failed to get one via DHCP.
+noipv4ll
+
+# Don't send any ARP requests.
+noarp
+
+# Don't attmept to configure an IPv6 address.
+noipv6
+
+# Force the sending of the short hostname.
+# So DDNS will always work, even if the hostname domain is different
+# from the DHCP servers.
+hostname_short
+# Configuration file for dircolors, a utility to help you set the
+# LS_COLORS environment variable used by GNU ls with the --color option.
+
+# Copyright (C) 1996-2023 Free Software Foundation, Inc.
+# Copying and distribution of this file, with or without modification,
+# are permitted provided the copyright notice and this notice are preserved.
+
+#
+# The keywords COLOR, OPTIONS, and EIGHTBIT (honored by the
+# slackware version of dircolors) are recognized but ignored by GNU dircolors.
+
+# This file goes in the /etc directory, and must be world readable.
+# You can copy this file to .dircolors in your $HOME directory to override
+# the system defaults.  This is also may be handled directly by the
+# /etc/profile.d/color_ls.sh and /etc/profile.d/color_ls.csh scripts.
+
+# Global config options can be specified before TERM or COLORTERM entries
+
+# ===================================================================
+# Terminal filters
+# ===================================================================
+# Below are TERM or COLORTERM entries, which can be glob patterns, which
+# restrict following config to systems with matching environment variables.
+COLORTERM ?*
+TERM Eterm
+TERM ansi
+TERM *color*
+TERM con[0-9]*x[0-9]*
+TERM cons25
+TERM console
+TERM cygwin
+TERM *direct*
+TERM dtterm
+TERM gnome
+TERM hurd
+TERM jfbterm
+TERM konsole
+TERM kterm
+TERM linux
+TERM linux-c
+TERM mlterm
+TERM putty
+TERM rxvt*
+TERM screen*
+TERM st
+TERM terminator
+TERM tmux*
+TERM vt100
+TERM xterm*
+
+# ===================================================================
+# Basic file attributes
+# ===================================================================
+# Below are the color init strings for the basic file types.
+# One can use codes for 256 or more colors supported by modern terminals.
+# The default color codes use the capabilities of an 8 color terminal
+# with some additional attributes as per the following codes:
+# Attribute codes:
+# 00=none 01=bold 04=underscore 05=blink 07=reverse 08=concealed
+# Text color codes:
+# 30=black 31=red 32=green 33=yellow 34=blue 35=magenta 36=cyan 37=white
+# Background color codes:
+# 40=black 41=red 42=green 43=yellow 44=blue 45=magenta 46=cyan 47=white
+#NORMAL 00	# no color code at all
+#FILE 00	# regular file: use no color at all
+RESET 0		# reset to "normal" color
+DIR 01;34	# directory
+LINK 01;36	# symbolic link.  (If you set this to 'target' instead of a
+                # numerical value, the color is as for the file pointed to.)
+MULTIHARDLINK 00	# regular file with more than one link
+FIFO 40;33	# pipe
+SOCK 01;35	# socket
+DOOR 01;35	# door
+BLK 40;33;01	# block device driver
+CHR 40;33;01	# character device driver
+ORPHAN 40;31;01 # symlink to nonexistent file, or non-stat'able file ...
+MISSING 00      # ... and the files they point to
+SETUID 37;41	# file that is setuid (u+s)
+SETGID 30;43	# file that is setgid (g+s)
+CAPABILITY 00	# file with capability (very expensive to lookup)
+STICKY_OTHER_WRITABLE 30;42 # dir that is sticky and other-writable (+t,o+w)
+OTHER_WRITABLE 34;42 # dir that is other-writable (o+w) and not sticky
+STICKY 37;44	# dir with the sticky bit set (+t) and not other-writable
+
+# This is for files with execute permission:
+EXEC 01;32
+
+# ===================================================================
+# File extension attributes
+# ===================================================================
+# List any file extensions like '.gz' or '.tar' that you would like ls
+# to color below. Put the suffix, a space, and the color init string.
+# (and any comments you want to add after a '#').
+# Suffixes are matched case insensitively, but if you define different
+# init strings for separate cases, those will be honored.
+#
+
+# If you use DOS-style suffixes, you may want to uncomment the following:
+#.cmd 01;32 # executables (bright green)
+#.exe 01;32
+#.com 01;32
+#.btm 01;32
+#.bat 01;32
+# Or if you want to color scripts even if they do not have the
+# executable bit actually set.
+.sh  01;32
+.csh 01;32
+
+# archives or compressed (bright red)
+.tar 01;31
+.tgz 01;31
+.arc 01;31
+.arj 01;31
+.taz 01;31
+.lha 01;31
+.lz4 01;31
+.lzh 01;31
+.lzma 01;31
+.tlz 01;31
+.txz 01;31
+.tzo 01;31
+.t7z 01;31
+.zip 01;31
+.z   01;31
+.dz  01;31
+.gz  01;31
+.lrz 01;31
+.lz  01;31
+.lzo 01;31
+.xz  01;31
+.zst 01;31
+.tzst 01;31
+.bz2 01;31
+.bz  01;31
+.tbz 01;31
+.tbz2 01;31
+.tz  01;31
+.deb 01;31
+.rpm 01;31
+.jar 01;31
+.war 01;31
+.ear 01;31
+.sar 01;31
+.rar 01;31
+.alz 01;31
+.ace 01;31
+.zoo 01;31
+.cpio 01;31
+.7z  01;31
+.rz  01;31
+.cab 01;31
+.wim 01;31
+.swm 01;31
+.dwm 01;31
+.esd 01;31
+
+# image formats
+.avif 01;35
+.jpg 01;35
+.jpeg 01;35
+.mjpg 01;35
+.mjpeg 01;35
+.gif 01;35
+.bmp 01;35
+.pbm 01;35
+.pgm 01;35
+.ppm 01;35
+.tga 01;35
+.xbm 01;35
+.xpm 01;35
+.tif 01;35
+.tiff 01;35
+.png 01;35
+.svg 01;35
+.svgz 01;35
+.mng 01;35
+.pcx 01;35
+.mov 01;35
+.mpg 01;35
+.mpeg 01;35
+.m2v 01;35
+.mkv 01;35
+.webm 01;35
+.webp 01;35
+.ogm 01;35
+.mp4 01;35
+.m4v 01;35
+.mp4v 01;35
+.vob 01;35
+.qt  01;35
+.nuv 01;35
+.wmv 01;35
+.asf 01;35
+.rm  01;35
+.rmvb 01;35
+.flc 01;35
+.avi 01;35
+.fli 01;35
+.flv 01;35
+.gl 01;35
+.dl 01;35
+.xcf 01;35
+.xwd 01;35
+.yuv 01;35
+.cgm 01;35
+.emf 01;35
+
+# https://wiki.xiph.org/MIME_Types_and_File_Extensions
+.ogv 01;35
+.ogx 01;35
+
+# audio formats
+.aac 00;36
+.au 00;36
+.flac 00;36
+.m4a 00;36
+.mid 00;36
+.midi 00;36
+.mka 00;36
+.mp3 00;36
+.mpc 00;36
+.ogg 00;36
+.ra 00;36
+.wav 00;36
+
+# https://wiki.xiph.org/MIME_Types_and_File_Extensions
+.oga 00;36
+.opus 00;36
+.spx 00;36
+.xspf 00;36
+
+# backup files
+*~ 00;90
+*# 00;90
+.bak 00;90
+.crdownload 00;90
+.dpkg-dist 00;90
+.dpkg-new 00;90
+.dpkg-old 00;90
+.dpkg-tmp 00;90
+.old 00;90
+.orig 00;90
+.part 00;90
+.rej 00;90
+.rpmnew 00;90
+.rpmorig 00;90
+.rpmsave 00;90
+.swp 00;90
+.tmp 00;90
+.ucf-dist 00;90
+.ucf-new 00;90
+.ucf-old 00;90
+
+#
+# Subsequent TERM or COLORTERM entries, can be used to add / override
+# config specific to those matching environment variables.
+# e2scrub configuration file
+
+# Uncomment to enable automatic periodic runs of e2scrub_all
+# (either via cron or via a systemd timer)
+# periodic_e2scrub=1
+
+# e-mail destination used by e2scrub_fail when problems are found with
+# the file system.
+# recipient=root
+
+# e-mail sender used by e2scrub_fail when problems are found with
+# the file system.
+# sender=e2scrub@host.domain.name
+
+# Snapshots will be created to run fsck; the snapshot will be of this size.
+# snap_size_mb=256
+
+# Set this to 1 to enable fstrim for everyone.
+# fstrim=0
+
+# Arguments passed into e2fsck.
+# e2fsck_opts="-vtt"
+
+# Set this to 1 to have e2scrub_all scrub all LVs, not just the mounted ones.
+# scrub_all=0
+#
+# This file is parsed by pam_env module
+#
+# Syntax: simple "KEY=VAL" pairs on separate lines
+#
+/srv/public -ro,insecure,no_subtree_check,fsid=1 *
+#/srv/share -rw,insecure,fsid=0,sec=krb5 *
+ALT Server 11.0 (Mendelevium)
+# This file defines the filesystems search order used by a
+# 'mount -t auto' command.  For more details see mount(8).
+proc		/proc			proc	nosuid,noexec,gid=proc				0 0
+devpts		/dev/pts		devpts  nosuid,noexec,gid=tty,mode=620,ptmxmode=0666	0 0
+tmpfs		/tmp			tmpfs	nosuid						0 0
+UUID=67b876d4-3542-401e-b1a5-1f076b4b5a5a	/	ext4	relatime	1	1
+UUID=7d409015-7751-484c-ab6a-789357e2236e	swap	swap	defaults	0	0
+# Configuration for getaddrinfo(3).
+#
+# So far only configuration for the destination address sorting is needed.
+# RFC 3484 governs the sorting.  But the RFC also says that system
+# administrators should be able to overwrite the defaults.  This can be
+# achieved here.
+#
+# All lines have an initial identifier specifying the option followed by
+# up to two values.  Information specified in this file replaces the
+# default information.  Complete absence of data of one kind causes the
+# appropriate default information to be used.  The supported commands include:
+#
+# reload  <yes|no>
+#    If set to yes, each getaddrinfo(3) call will check whether this file
+#    changed and if necessary reload.  This option should not really be
+#    used.  There are possible runtime problems.  The default is no.
+#
+# label   <mask>   <value>
+#    Add another rule to the RFC 3484 label table.  See section 2.1 in
+#    RFC 3484.  The default is:
+#
+#label ::1/128       0
+#label ::/0          1
+#label 2002::/16     2
+#label ::/96         3
+#label ::ffff:0:0/96 4
+#label fec0::/10     5
+#label fc00::/7      6
+#label 2001:0::/32   7
+#
+#    This default differs from the tables given in RFC 3484 by handling
+#    (now obsolete) site-local IPv6 addresses and Unique Local Addresses.
+#    The reason for this difference is that these addresses are never
+#    NATed while IPv4 site-local addresses most probably are.  Given
+#    the precedence of IPv6 over IPv4 (see below) on machines having only
+#    site-local IPv4 and IPv6 addresses a lookup for a global address would
+#    see the IPv6 be preferred.  The result is a long delay because the
+#    site-local IPv6 addresses cannot be used while the IPv4 address is
+#    (at least for the foreseeable future) NATed.  We also treat Teredo
+#    tunnels special.
+#
+# precedence  <mask>   <value>
+#    Add another rule to the RFC 3484 precedence table.  See section 2.1
+#    and 10.3 in RFC 3484.  The default is:
+#
+#precedence  ::1/128       50
+#precedence  ::/0          40
+#precedence  2002::/16     30
+#precedence ::/96          20
+#precedence ::ffff:0:0/96  10
+#
+#    For sites which prefer IPv4 connections change the last line to
+#
+#precedence ::ffff:0:0/96  100
+
+#
+# scopev4  <mask>  <value>
+#    Add another rule to the RFC 6724 scope table for IPv4 addresses.
+#    By default the scope IDs described in section 3.2 in RFC 6724 are
+#    used.  Changing these defaults should hardly ever be necessary.
+#    The defaults are equivalent to:
+#
+#scopev4 ::ffff:169.254.0.0/112  2
+#scopev4 ::ffff:127.0.0.0/104    2
+#scopev4 ::ffff:0.0.0.0/96       14
+# Configuration file for the color grep utility
+
+# 'none' shuts colorization off.
+#COLOR none
+
+# Specifies the colors and other attributes used to highlight various parts
+# of the output.  See frep(1) for details.
+#GREP_COLORS ms=01;31:mc=01;31:sl=:cx=:fn=35:ln=32:bn=32:se=36
+root:x:0:
+bin:x:1:root
+daemon:x:2:root
+sys:x:3:root,bin,adm
+adm:x:4:root
+tty:x:5:
+disk:x:6:root
+lp:x:7:
+mem:x:8:
+kmem:x:9:
+wheel:x:10:root,user
+firewall:x:11:
+mail:x:12:
+news:x:13:
+uucp:x:14:
+man:x:15:
+rpm:x:16:
+console:x:17:
+wnn:x:18:
+proc:x:19:root
+games:x:20:
+slocate:x:21:
+cdrom:x:22:
+squid:x:23:
+chkpwd:x:24:
+named:x:25:
+shadow:x:26:
+auth:x:27:
+nscd:x:28:
+rpcuser:x:29:
+gopher:x:30:
+netwatch:x:31:
+rpc:x:32:
+rpminst:x:33:
+asterisk:x:34:
+kqemu:x:35:
+vmusers:x:36:
+dip:x:40:
+mailman:x:41:
+postfix:x:42:
+popa3d:x:43:
+xfs:x:44:
+mysql:x:45:
+postgres:x:46:
+gdm:x:47:
+postman:x:48:
+ftp:x:50:
+ftpadmin:x:51:
+cvs:x:52:
+cvsadmin:x:53:
+postdrop:x:54:
+ldap:x:55:
+loop:x:70:
+floppy:x:71:
+utmp:x:72:
+exim:x:79:
+cdwriter:x:80:
+audio:x:81:
+x10:x:82:
+radio:x:83:
+apache:x:96:
+_nobody99:x:99:
+users:x:100:user
+nobody:x:65534:
+osec:x:999:
+utempter:x:998:
+_gnupg:x:997:
+crontab:x:996:
+netadmin:x:995:
+_autoipd:x:994:
+messagebus:x:993:
+polkitd:x:992:
+_keytab:x:991:
+tape:x:990:
+dialout:x:989:
+input:x:988:
+video:x:987:
+render:x:986:
+sgx:x:985:
+systemd-journal:x:984:
+systemd-oom:x:983:
+nfsuser:x:982:
+sshd:x:981:
+sasl:x:980:
+_xfsscrub:x:979:
+_alteratord:x:978:
+mailadm:x:977:
+_nslcd:x:976:
+systemd-network:x:975:
+systemd-resolve:x:974:
+sshagent:x:973:
+ntpd:x:972:
+tcpdump:x:971:
+_chrony:x:970:
+cgred:x:969:
+iputils:x:968:
+everyone:x:98:
+localadmins:x:101:
+powerusers:x:102:
+guests:x:103:
+accountops:x:104:
+serverops:x:105:
+printops:x:106:
+backupops:x:107:
+replicators:x:108:
+networkops:x:109:
+remote:x:110:
+_iftop:x:967:
+screen:x:966:
+_dhcpcd:x:965:
+user:x:1000:
+_haproxy:x:964:
+_nginx:x:963:
+_webserver:x:962:_nginx
+root:x:0:
+bin:x:1:root
+daemon:x:2:root
+sys:x:3:root,bin,adm
+adm:x:4:root
+tty:x:5:
+disk:x:6:root
+lp:x:7:
+mem:x:8:
+kmem:x:9:
+wheel:x:10:root,user
+firewall:x:11:
+mail:x:12:
+news:x:13:
+uucp:x:14:
+man:x:15:
+rpm:x:16:
+console:x:17:
+wnn:x:18:
+proc:x:19:root
+games:x:20:
+slocate:x:21:
+cdrom:x:22:
+squid:x:23:
+chkpwd:x:24:
+named:x:25:
+shadow:x:26:
+auth:x:27:
+nscd:x:28:
+rpcuser:x:29:
+gopher:x:30:
+netwatch:x:31:
+rpc:x:32:
+rpminst:x:33:
+asterisk:x:34:
+kqemu:x:35:
+vmusers:x:36:
+dip:x:40:
+mailman:x:41:
+postfix:x:42:
+popa3d:x:43:
+xfs:x:44:
+mysql:x:45:
+postgres:x:46:
+gdm:x:47:
+postman:x:48:
+ftp:x:50:
+ftpadmin:x:51:
+cvs:x:52:
+cvsadmin:x:53:
+postdrop:x:54:
+ldap:x:55:
+loop:x:70:
+floppy:x:71:
+utmp:x:72:
+exim:x:79:
+cdwriter:x:80:
+audio:x:81:
+x10:x:82:
+radio:x:83:
+apache:x:96:
+_nobody99:x:99:
+users:x:100:user
+nobody:x:65534:
+osec:x:999:
+utempter:x:998:
+_gnupg:x:997:
+crontab:x:996:
+netadmin:x:995:
+_autoipd:x:994:
+messagebus:x:993:
+polkitd:x:992:
+_keytab:x:991:
+tape:x:990:
+dialout:x:989:
+input:x:988:
+video:x:987:
+render:x:986:
+sgx:x:985:
+systemd-journal:x:984:
+systemd-oom:x:983:
+nfsuser:x:982:
+sshd:x:981:
+sasl:x:980:
+_xfsscrub:x:979:
+_alteratord:x:978:
+mailadm:x:977:
+_nslcd:x:976:
+systemd-network:x:975:
+systemd-resolve:x:974:
+sshagent:x:973:
+ntpd:x:972:
+tcpdump:x:971:
+_chrony:x:970:
+cgred:x:969:
+iputils:x:968:
+everyone:x:98:
+localadmins:x:101:
+powerusers:x:102:
+guests:x:103:
+accountops:x:104:
+serverops:x:105:
+printops:x:106:
+backupops:x:107:
+replicators:x:108:
+networkops:x:109:
+remote:x:110:
+_iftop:x:967:
+screen:x:966:
+_dhcpcd:x:965:
+user:x:1000:
+_haproxy:x:964:
+_nginx:x:963:
+_webserver:x:962:
+#
+# DO NOT EDIT THIS FILE
+#
+# It is automatically generated by grub-mkconfig using templates
+# from /etc/grub.d and settings from /etc/sysconfig/grub2
+#
+
+### BEGIN /etc/grub.d/00_header ###
+if [ -s $prefix/grubenv ]; then
+  load_env
+fi
+if [ "${next_entry}" ] ; then
+   set default="${next_entry}"
+   set next_entry=
+   save_env next_entry
+   set boot_once=true
+else
+   set default="${saved_entry}"
+fi
+
+if [ x"${feature_menuentry_id}" = xy ]; then
+  menuentry_id_option="--id"
+else
+  menuentry_id_option=""
+fi
+
+export menuentry_id_option
+
+if [ "${prev_saved_entry}" ]; then
+  set saved_entry="${prev_saved_entry}"
+  save_env saved_entry
+  set prev_saved_entry=
+  save_env prev_saved_entry
+  set boot_once=true
+fi
+
+function savedefault {
+  if [ -z "${boot_once}" ]; then
+    saved_entry="${chosen}"
+    save_env saved_entry
+  fi
+}
+
+function load_video {
+  if [ x$feature_all_video_module = xy ]; then
+    insmod all_video
+  else
+    insmod efi_gop
+    insmod efi_uga
+    insmod ieee1275_fb
+    insmod vbe
+    insmod vga
+    insmod video_bochs
+    insmod video_cirrus
+  fi
+}
+
+if [ x$feature_default_font_path = xy ] ; then
+   font=unicode
+else
+insmod part_msdos
+insmod ext2
+set root='hd0,msdos2'
+if [ x$feature_platform_search_hint = xy ]; then
+  search --no-floppy --fs-uuid --set=root --hint-bios=hd0,msdos2 --hint-efi=hd0,msdos2 --hint-baremetal=ahci0,msdos2  67b876d4-3542-401e-b1a5-1f076b4b5a5a
+else
+  search --no-floppy --fs-uuid --set=root 67b876d4-3542-401e-b1a5-1f076b4b5a5a
+fi
+    font="/usr/share/grub/unicode.pf2"
+fi
+
+if loadfont $font ; then
+  set gfxmode=auto
+  load_video
+  insmod gfxterm
+  set locale_dir=$prefix/locale
+  set lang=ru_RU
+  insmod gettext
+fi
+terminal_output gfxterm
+if [ x$feature_timeout_style = xy ] ; then
+  set timeout_style=menu
+  set timeout=5
+# Fallback normal timeout code in case the timeout_style feature is
+# unavailable.
+else
+  set timeout=5
+fi
+# interrupt grub booting process if shift key pressed
+if keystatus --shift;then
+  set timeout=-1
+fi
+### END /etc/grub.d/00_header ###
+
+### BEGIN /etc/grub.d/05_altlinux_theme ###
+set menu_color_normal=white/black
+set menu_color_highlight=black/light-gray
+### END /etc/grub.d/05_altlinux_theme ###
+
+### BEGIN /etc/grub.d/10_linux ###
+menuentry 'ALT Server 11.0' --class gnu-linux --class gnu --class os --class altlinux --unrestricted $menuentry_id_option 'gnulinux-simple-67b876d4-3542-401e-b1a5-1f076b4b5a5a' {
+	savedefault
+	load_video
+	insmod gzio
+	insmod part_msdos
+	insmod ext2
+	set root='hd0,msdos2'
+	if [ x$feature_platform_search_hint = xy ]; then
+	  search --no-floppy --fs-uuid --set=root --hint-bios=hd0,msdos2 --hint-efi=hd0,msdos2 --hint-baremetal=ahci0,msdos2  67b876d4-3542-401e-b1a5-1f076b4b5a5a
+	else
+	  search --no-floppy --fs-uuid --set=root 67b876d4-3542-401e-b1a5-1f076b4b5a5a
+	fi
+	linux	/boot/vmlinuz root=UUID=67b876d4-3542-401e-b1a5-1f076b4b5a5a ro resume=/dev/disk/by-uuid/7d409015-7751-484c-ab6a-789357e2236e panic=30 splash
+	initrd	/boot/initrd.img
+}
+submenu '–î–æ–ø–æ–ª–Ω–∏—Ç–µ–ª—å–Ω—ã–µ –ø–∞—Ä–∞–º–µ—Ç—Ä—ã –¥–ª—è ALT Server 11.0' $menuentry_id_option 'gnulinux-advanced-67b876d4-3542-401e-b1a5-1f076b4b5a5a' {
+	menuentry 'ALT Server 11.0, vmlinuz' --class gnu-linux --class gnu --class os --class altlinux --unrestricted $menuentry_id_option 'gnulinux-vmlinuz-advanced-67b876d4-3542-401e-b1a5-1f076b4b5a5a' {
+	savedefault
+		load_video
+		insmod gzio
+		insmod part_msdos
+		insmod ext2
+		set root='hd0,msdos2'
+		if [ x$feature_platform_search_hint = xy ]; then
+		  search --no-floppy --fs-uuid --set=root --hint-bios=hd0,msdos2 --hint-efi=hd0,msdos2 --hint-baremetal=ahci0,msdos2  67b876d4-3542-401e-b1a5-1f076b4b5a5a
+		else
+		  search --no-floppy --fs-uuid --set=root 67b876d4-3542-401e-b1a5-1f076b4b5a5a
+		fi
+		linux	/boot/vmlinuz root=UUID=67b876d4-3542-401e-b1a5-1f076b4b5a5a ro resume=/dev/disk/by-uuid/7d409015-7751-484c-ab6a-789357e2236e panic=30 splash
+		initrd	/boot/initrd.img
+	}
+	menuentry 'ALT Server 11.0, vmlinuz (recovery mode)' --class gnu-linux --class gnu --class os --class altlinux --unrestricted $menuentry_id_option 'gnulinux-vmlinuz-recovery-67b876d4-3542-401e-b1a5-1f076b4b5a5a' {
+		load_video
+		insmod gzio
+		insmod part_msdos
+		insmod ext2
+		set root='hd0,msdos2'
+		if [ x$feature_platform_search_hint = xy ]; then
+		  search --no-floppy --fs-uuid --set=root --hint-bios=hd0,msdos2 --hint-efi=hd0,msdos2 --hint-baremetal=ahci0,msdos2  67b876d4-3542-401e-b1a5-1f076b4b5a5a
+		else
+		  search --no-floppy --fs-uuid --set=root 67b876d4-3542-401e-b1a5-1f076b4b5a5a
+		fi
+		linux	/boot/vmlinuz root=UUID=67b876d4-3542-401e-b1a5-1f076b4b5a5a ro failsafe vga=normal
+		initrd	/boot/initrd.img
+	}
+	menuentry 'ALT Server 11.0, 6.12.27-6.12-alt1' --class gnu-linux --class gnu --class os --class altlinux --unrestricted $menuentry_id_option 'gnulinux-6.12.27-6.12-alt1-advanced-67b876d4-3542-401e-b1a5-1f076b4b5a5a' {
+	savedefault
+		load_video
+		insmod gzio
+		insmod part_msdos
+		insmod ext2
+		set root='hd0,msdos2'
+		if [ x$feature_platform_search_hint = xy ]; then
+		  search --no-floppy --fs-uuid --set=root --hint-bios=hd0,msdos2 --hint-efi=hd0,msdos2 --hint-baremetal=ahci0,msdos2  67b876d4-3542-401e-b1a5-1f076b4b5a5a
+		else
+		  search --no-floppy --fs-uuid --set=root 67b876d4-3542-401e-b1a5-1f076b4b5a5a
+		fi
+		linux	/boot/vmlinuz-6.12.27-6.12-alt1 root=UUID=67b876d4-3542-401e-b1a5-1f076b4b5a5a ro resume=/dev/disk/by-uuid/7d409015-7751-484c-ab6a-789357e2236e panic=30 splash
+		initrd	/boot/initrd-6.12.27-6.12-alt1.img
+	}
+	menuentry 'ALT Server 11.0, 6.12' --class gnu-linux --class gnu --class os --class altlinux --unrestricted $menuentry_id_option 'gnulinux-6.12-advanced-67b876d4-3542-401e-b1a5-1f076b4b5a5a' {
+	savedefault
+		load_video
+		insmod gzio
+		insmod part_msdos
+		insmod ext2
+		set root='hd0,msdos2'
+		if [ x$feature_platform_search_hint = xy ]; then
+		  search --no-floppy --fs-uuid --set=root --hint-bios=hd0,msdos2 --hint-efi=hd0,msdos2 --hint-baremetal=ahci0,msdos2  67b876d4-3542-401e-b1a5-1f076b4b5a5a
+		else
+		  search --no-floppy --fs-uuid --set=root 67b876d4-3542-401e-b1a5-1f076b4b5a5a
+		fi
+		linux	/boot/vmlinuz-6.12 root=UUID=67b876d4-3542-401e-b1a5-1f076b4b5a5a ro resume=/dev/disk/by-uuid/7d409015-7751-484c-ab6a-789357e2236e panic=30 splash
+		initrd	/boot/initrd-6.12.img
+	}
+}
+
+### END /etc/grub.d/10_linux ###
+
+### BEGIN /etc/grub.d/20_linux_xen ###
+
+### END /etc/grub.d/20_linux_xen ###
+
+### BEGIN /etc/grub.d/25_bli ###
+if [ "$grub_platform" = "efi" ]; then
+  insmod bli
+fi
+### END /etc/grub.d/25_bli ###
+
+### BEGIN /etc/grub.d/30_os-prober ###
+### END /etc/grub.d/30_os-prober ###
+
+### BEGIN /etc/grub.d/30_uefi-firmware ###
+if [ "$grub_platform" = "efi" ]; then
+	menuentry 'UEFI Firmware Settings' $menuentry_id_option 'uefi-firmware' {
+		fwsetup
+	}
+fi
+### END /etc/grub.d/30_uefi-firmware ###
+
+### BEGIN /etc/grub.d/39_memtest ###
+if [ "$grub_platform" = "pc" ]; then
+	menuentry "Memtest86+-7.20" {
+		insmod part_msdos
+		insmod ext2
+		set root='hd0,msdos2'
+		if [ x$feature_platform_search_hint = xy ]; then
+		  search --no-floppy --fs-uuid --set=root --hint-bios=hd0,msdos2 --hint-efi=hd0,msdos2 --hint-baremetal=ahci0,msdos2  67b876d4-3542-401e-b1a5-1f076b4b5a5a
+		else
+		  search --no-floppy --fs-uuid --set=root 67b876d4-3542-401e-b1a5-1f076b4b5a5a
+		fi
+		linux /boot/memtest-7.20.bin
+	}
+fi
+if [ "$grub_platform" = "efi" ]; then
+	menuentry "Memtest86+-7.20 (may not work with Secure Boot)" {
+		insmod part_msdos
+		insmod ext2
+		set root='hd0,msdos2'
+		if [ x$feature_platform_search_hint = xy ]; then
+		  search --no-floppy --fs-uuid --set=root --hint-bios=hd0,msdos2 --hint-efi=hd0,msdos2 --hint-baremetal=ahci0,msdos2  67b876d4-3542-401e-b1a5-1f076b4b5a5a
+		else
+		  search --no-floppy --fs-uuid --set=root 67b876d4-3542-401e-b1a5-1f076b4b5a5a
+		fi
+		linux /boot/memtest-7.20.efi
+	}
+fi
+### END /etc/grub.d/39_memtest ###
+
+### BEGIN /etc/grub.d/40_custom ###
+# This file provides an easy way to add custom menu entries.  Simply type the
+# menu entries you want to add after this comment.  Be careful not to change
+# the 'exec tail' line above.
+### END /etc/grub.d/40_custom ###
+
+### BEGIN /etc/grub.d/41_custom ###
+if [ -f  ${config_directory}/custom.cfg ]; then
+  source ${config_directory}/custom.cfg
+elif [ -z "${config_directory}" -a -f  $prefix/custom.cfg ]; then
+  source $prefix/custom.cfg
+fi
+### END /etc/grub.d/41_custom ###
+root:x::
+bin:x::root
+daemon:x::root
+sys:x::root,bin,adm
+adm:x::root
+tty:x::
+disk:x::root
+lp:x::
+mem:x::
+kmem:x::
+wheel:x::root,user
+firewall:x::
+mail:x::
+news:x::
+uucp:x::
+man:x::
+rpm:x::
+console:x::
+wnn:x::
+proc:x::root
+games:x::
+slocate:x::
+cdrom:x::
+squid:x::
+chkpwd:x::
+named:x::
+shadow:x::
+auth:x::
+nscd:x::
+rpcuser:x::
+gopher:x::
+netwatch:x::
+rpc:x::
+rpminst:x::
+asterisk:x::
+kqemu:x::
+vmusers:x::
+dip:x::
+mailman:x::
+postfix:x::
+popa3d:x::
+xfs:x::
+mysql:x::
+postgres:x::
+gdm:x::
+postman:x::
+ftp:x::
+ftpadmin:x::
+cvs:x::
+cvsadmin:x::
+postdrop:x::
+ldap:x::
+loop:x::
+floppy:x::
+utmp:x::
+exim:x::
+cdwriter:x::
+audio:x::
+x10:x::
+radio:x::
+apache:x::
+_nobody99:x::
+users:x::user
+nobody:x::
+osec:!::
+utempter:!::
+_gnupg:!::
+crontab:!::
+netadmin:!::
+_autoipd:!::
+messagebus:!::
+polkitd:!::
+_keytab:!::
+tape:!::
+dialout:!::
+input:!::
+video:!::
+render:!::
+sgx:!::
+systemd-journal:!::
+systemd-oom:!::
+nfsuser:!::
+sshd:!::
+sasl:!::
+_xfsscrub:!::
+_alteratord:!::
+mailadm:!::
+_nslcd:!::
+systemd-network:!::
+systemd-resolve:!::
+sshagent:!::
+ntpd:!::
+tcpdump:!::
+_chrony:!::
+cgred:!::
+iputils:!::
+everyone:!::
+localadmins:!::
+powerusers:!::
+guests:!::
+accountops:!::
+serverops:!::
+printops:!::
+backupops:!::
+replicators:!::
+networkops:!::
+remote:!::
+_iftop:!::
+screen:!::
+_dhcpcd:!::
+user:!::
+_haproxy:!::
+_nginx:!::
+_webserver:!::_nginx
+root:x::
+bin:x::root
+daemon:x::root
+sys:x::root,bin,adm
+adm:x::root
+tty:x::
+disk:x::root
+lp:x::
+mem:x::
+kmem:x::
+wheel:x::root,user
+firewall:x::
+mail:x::
+news:x::
+uucp:x::
+man:x::
+rpm:x::
+console:x::
+wnn:x::
+proc:x::root
+games:x::
+slocate:x::
+cdrom:x::
+squid:x::
+chkpwd:x::
+named:x::
+shadow:x::
+auth:x::
+nscd:x::
+rpcuser:x::
+gopher:x::
+netwatch:x::
+rpc:x::
+rpminst:x::
+asterisk:x::
+kqemu:x::
+vmusers:x::
+dip:x::
+mailman:x::
+postfix:x::
+popa3d:x::
+xfs:x::
+mysql:x::
+postgres:x::
+gdm:x::
+postman:x::
+ftp:x::
+ftpadmin:x::
+cvs:x::
+cvsadmin:x::
+postdrop:x::
+ldap:x::
+loop:x::
+floppy:x::
+utmp:x::
+exim:x::
+cdwriter:x::
+audio:x::
+x10:x::
+radio:x::
+apache:x::
+_nobody99:x::
+users:x::user
+nobody:x::
+osec:!::
+utempter:!::
+_gnupg:!::
+crontab:!::
+netadmin:!::
+_autoipd:!::
+messagebus:!::
+polkitd:!::
+_keytab:!::
+tape:!::
+dialout:!::
+input:!::
+video:!::
+render:!::
+sgx:!::
+systemd-journal:!::
+systemd-oom:!::
+nfsuser:!::
+sshd:!::
+sasl:!::
+_xfsscrub:!::
+_alteratord:!::
+mailadm:!::
+_nslcd:!::
+systemd-network:!::
+systemd-resolve:!::
+sshagent:!::
+ntpd:!::
+tcpdump:!::
+_chrony:!::
+cgred:!::
+iputils:!::
+everyone:!::
+localadmins:!::
+powerusers:!::
+guests:!::
+accountops:!::
+serverops:!::
+printops:!::
+backupops:!::
+replicators:!::
+networkops:!::
+remote:!::
+_iftop:!::
+screen:!::
+_dhcpcd:!::
+user:!::
+_haproxy:!::
+_nginx:!::
+_webserver:!::
+order hosts,bind
+multi on
+host-130
+127.0.0.1	localhost.localdomain localhost
+::1	localhost6.localdomain localhost6
+#
+# hosts.allow	This file describes the names of the hosts which are
+#		allowed to use the local INET services, as decided
+#		by the '/usr/sbin/tcpd' server.
+#
+
+#
+# hosts.deny	This file describes the names of the hosts which are
+#		*not* allowed to use the local INET services, as decided
+#		by the '/usr/sbin/tcpd' server.
+#
+# The portmap line is redundant, but it is left to remind you that
+# the new secure portmap uses hosts.deny and hosts.allow.  In particular
+# you should know that NFS uses portmap!
+
+This is the file .../info/dir, which contains the
+topmost node of the Info hierarchy, called (dir)Top.
+The first time you invoke Info you start off looking at this node.
+
+File: dir,	Node: Top	This is the top of the INFO tree
+
+  This (the Directory node) gives a menu of major topics.
+  Typing "q" exits, "H" lists all Info commands, "d" returns here,
+  "h" gives a primer for first-timers,
+  "mEmacs<Return>" visits the Emacs manual, etc.
+
+  In Emacs, you can click mouse button 2 on a menu item or cross reference
+  to select it.
+
+* Menu:
+# /etc/initlog.conf
+#
+# initlog configuration file
+# 
+# lines preceded by a '#' are comments
+#
+# anything not recognized is ignored. :)
+
+# This sets the default logging facility. (can override with command line arguments)
+#facility daemon
+
+# This sets the default logging priority. (can override with command line arguments)
+#priority notice
+
+# ignore foo
+# means to discard any output lines that match the regular expression foo
+
+# This regexp is useful if you use fsck's -C option. 
+ignore [^:]+: \|[=]+
+# This regexp is useful for fsck's feature of setting file types
+ignore [^:]+: Setting filetype
+# This regexp is useful for quotacheck
+ignore ^[-\\\|\/]$
+# trying to detect modules and features to access to root volume
+AUTODETECT = all
+FEATURES += fsck
+# ALT Linux readline initialization file.
+
+# Don't show all if ambigious - it kills slow network connection.
+set show-all-if-ambiguous off
+
+# 8Bits support.
+set meta-flag on
+set convert-meta off
+set input-meta on
+set output-meta on
+
+# common
+"\e[1~": beginning-of-line
+"\e[2~": quoted-insert
+"\e[3~": delete-char
+"\e[4~": end-of-line
+"\e[5~": history-search-backward
+"\e[6~": history-search-forward
+"\e[A": previous-history
+"\e[B": next-history
+"\e[C": forward-char
+"\e[D": backward-char
+
+# xterm
+"\e[H": beginning-of-line
+"\e[F": end-of-line
+"\e[1;5A": history-search-backward
+"\e[1;5B": history-search-forward
+"\e[1;5C": forward-word
+"\e[1;5D": backward-word
+
+# rxvt
+"\e[7~": beginning-of-line
+"\e[8~": end-of-line
+"\eOa": history-search-backward
+"\eOb": history-search-forward
+"\eOc": forward-word
+"\eOd": backward-word
+
+# on nxterms
+"\e[\C-@": beginning-of-line
+"\e[e": end-of-line
+
+#if term=xterm
+#
+# Application keypad and cursor of xterm
+# with NumLock ON
+#
+# Operators
+"\eOo": "/"
+"\eOj": "*"
+"\eOm": "-"
+"\eOk": "+"
+"\eOl": "+"
+"\eOM": accept-line
+
+# Colon and dot
+# "\eOl": ","
+"\eOn":	"."
+
+# Numbers
+"\eOp": "0"
+"\eOq": "1"
+"\eOr": "2"
+"\eOs": "3"
+"\eOt": "4"
+"\eOu": "5"
+"\eOv": "6"
+"\eOw": "7"
+"\eOx": "8"
+"\eOy": "9"
+#endif xterm
+
+#
+# Application keypad and cursor of xterm
+#
+"\eOA": previous-history
+"\eOB": next-history
+"\eOC": forward-char
+"\eOD": backward-char
+"\eOE": re-read-init-file
+"\eOF": end-of-line
+"\eOH": beginning-of-line
+
+# Updates are disabled because this is a system package.
+ALLOW_UPDATE=false
+# Generated by iptables-save v1.8.10 on Sun Aug 24 22:50:37 2025
+*nat
+:PREROUTING ACCEPT [10:740]
+:INPUT ACCEPT [3:188]
+:OUTPUT ACCEPT [9:692]
+:POSTROUTING ACCEPT [9:692]
+-A PREROUTING -p tcp -m tcp --dport 12322 -j DNAT --to-destination 172.16.10.1:22
+-A POSTROUTING -s 172.16.10.0/24 -o ens33 -j MASQUERADE
+COMMIT
+# Completed on Sun Aug 24 22:50:37 2025
+# Generated by iptables-save v1.8.10 on Sun Aug 24 22:50:37 2025
+*filter
+:INPUT ACCEPT [23:1696]
+:FORWARD ACCEPT [4:336]
+:OUTPUT ACCEPT [15:1164]
+-A FORWARD -i ens37 -o ens33 -j ACCEPT
+COMMIT
+# Completed on Sun Aug 24 22:50:37 2025
+includedir /etc/krb5.conf.d/
+
+[logging]
+# default = FILE:/var/log/krb5libs.log
+# kdc = FILE:/var/log/krb5kdc.log
+# admin_server = FILE:/var/log/kadmind.log
+
+[libdefaults]
+ dns_lookup_kdc = true
+ dns_lookup_realm = true
+ ticket_lifetime = 24h
+ renew_lifetime = 7d
+ forwardable = true
+ rdns = false
+# default_realm = EXAMPLE.COM
+ default_ccache_name = KEYRING:persistent:%{uid}
+
+[realms]
+# EXAMPLE.COM = {
+#  default_domain = example.com
+# }
+
+[domain_realm]
+# .example.com = EXAMPLE.COM
+# example.com = EXAMPLE.COM
+glibc-ld.so.cache1.1  +     1                l*  e*                a-  Z-                '  '                ˘-  Ú-                Ñ#  }#                &  È&                …(  ¬(                )  )                T'  M'                Ä*  y*                h)  a)                0-  )-                ›0  ÷0                3  ,                Œ  «                É  |                *  #                C  <                ≥  ¨                k  d                ú  ï                _%  X%                Ö(  ~(                f'  _'                Ù0  Ì0                «"  ¿"                  
+                                     è  à                ,+  %+                J  C                ë/  ä/                ≥  ¨                ∆.  ø.                q   j                 »  ¡                j"  c"                ù+  ñ+                L$  E$                (  (                x%  q%                J)  C)                E+  >+                ™.  £.                Ú  Î                +'  $'                ‰$  ›$                #  ˛"                z'  s'                û  ó                â  Ç                µ  Æ                *  *                $  $                é.  á.                ¸  ı                Æ,  ß,                #/  /                	$  $                I   B                 ±+  ™+                ˘  Ú                "                  í  ã                                  	                  ~,  w,                0  0                ˇ/  ¯/                a  Z                „)  ‹)                j  c                Á/  ‡/                ª/  ¥/                §/  ù/                ú!  ï!                É!  |!                ≥"  ¨"                †"  ô"                Z  S                ©*  ¢*                 &  &                W.  P.                –  …                K  D                \   U                 R/  K/                ˜'  '                :/  3/                à-  Å-                ˚)  Ù)                §)  ù)                t-  m-                ƒ  Ω                /  (                é&  á&                &  ˛%                ø%  ∏%                °%  ö%                %  %                Î%  ‰%                †$  ô$                ^$  W$                x&  q&                2$  +$                ≥  ¨                G  @                w  p                Ô  Ë                “   À                 '  ˝&                D(  =(                «-  ¿-                                  }"  v"                £  ú                ˙  Û                	                    Í   „                 Ê!  ﬂ!                f/  _/                ÷*  œ*                ‡-  Ÿ-                ‹"  ’"                ı.  Ó.                Æ-  ß-                G,  @,                ›.  ÷.                ∏'  ±'                õ-  î-                é  á                Ê  ﬂ                ﬁ  ◊                ¡*  ∫*                :  3                a+  Z+                ‹&  ’&                ú   ï                 B!  ;!                x  q                ç  Ü                }/  v/                ‰,  ›,                ;  4                ˛,  ˜,                S  L                ˚$  Ù$                –$  …$                )"  ""                c,  \,                Ò"  Í"                /  /                ◊%  –%                ,(  %(                ≥(  ¨(                ,  ,                #*  *                I#  B#                f#  _#                Ü                    `&  Y&                !  ˙                 ‹  ’                À  ƒ                   ˘                Á  ‡                Å  z                6&  /&                K&  D&                .  .                ”/  Ã/                ∑#  ∞#                x  q                                  /,  (,                ≈,  æ,                :*  3*                A"  :"                ™0  £0                ,!  %!                •&  û&                  ˇ                #  #                $)  )                -  -                ]0  V0                ÿ+  —+                ,  ˇ+                è0  à0                ≈0  æ0                =0  60                x0  q0                À!  ƒ!                V"  O"                Ô+  Ë+                \(  U(                ç%  Ü%                `  Y                ª  ¥                &                  5   .                 È  ‚                è)  à)                :%  3%                u$  n$                ^  W                ‚'  €'                ·  ⁄                  ¸                B  ;                $                  »  ¡                –)  …)                ù(  ñ(                Í*  „*                °'  ö'                ∑!  ∞!                B'  ;'                p  i                í,  ã,                ö  ì                M%  F%                Ì#  Ê#                À#  ƒ#                Æ  ß                ”  Ã                ﬂ  ÿ                D  =                j  c                \!  U!                ¢  õ                ª)  ¥)                3#  ,#                6  /                !  !                ú#  ï#                "  "                å'  Ö'                π$  ≤$                ˝!  ˆ!                +  +                ã$  Ñ$                '%   %                A.  :.                #.  .                ¢  õ                ∆+  ø+                t+  m+                 +  ˘*                Ò(  Í(                î*  ç*                                  w.  p.                Õ'  ∆'                q(  j(                á+  Ä+                ∞   ©                 7)  0)                ﬁ(  ◊(                |)  u)                H-  A-                P*  I*                ¿&  π&              /lib64/libdevmapper-event-lvm2snapshot.so /lib64/libpostfix-dns.so /lib64/libpostfix-tls.so /lib64/liblftp-tasks.so /lib64/liblftp-jobs.so /lib64/libdevmapper-event-lvm2mirror.so /lib64/libpostfix-master.so /lib64/libdevmapper-event-lvm2vdo.so /lib64/libdevmapper-event-lvm2thin.so /lib64/libpostfix-util.so /lib64/libpostfix-global.so /lib64/libnssckbi.so /lib64/libdevmapper-event-lvm2raid.so /lib64/libperl-5.38.so /lib64/libirs-9.18.37.so /lib64/libdns-9.18.37.so /lib64/libns-9.18.37.so /lib64/libisccfg-9.18.37.so /lib64/libisc-9.18.37.so /lib64/libisccc-9.18.37.so /lib64/libbind9-9.18.37.so /lib64/libdb-4.7.so /lib64/libtcl8.6.so /lib64/libexpect5.45.4.so /lib64/liblua-5.4.so /lib64/liblua-5.3.so /lib64/libdevmapper-event-lvm2.so /lib64/libntfs-3g.so.89 /lib64/libiw.so.29 /lib64/libnghttp3.so.9 /lib64/libgsasl.so.18 /lib64/libhistory.so.8 /lib64/liburcu.so.8 /lib64/libngtcp2_crypto_gnutls.so.8 /lib64/liburcu-cds.so.8 /lib64/liburcu-qsbr.so.8 /lib64/liburcu-bp.so.8 /lib64/liburcu-common.so.8 /lib64/liburcu-signal.so.8 /lib64/libffi.so.8 /lib64/libreadline.so.8 /lib64/libnettle.so.8 /lib64/liburcu-memb.so.8 /lib64/liburcu-mb.so.8 /lib64/libpcap.so.0.8 /lib64/libduktape.so.207 /lib64/librpmio.so.7 /lib64/librpmsign.so.7 /lib64/librpm.so.7 /lib64/libevent-2.1.so.7 /lib64/libevent_pthreads-2.1.so.7 /lib64/libevent_openssl-2.1.so.7 /lib64/libevent_core-2.1.so.7 /lib64/libevent_extra-2.1.so.7 /lib64/libpng16.so.16 /lib64/libngtcp2.so.16 /lib64/libmenuw.so.6 /lib64/libncursesw.so.6 /lib64/libformw.so.6 /lib64/libpanelw.so.6 /lib64/libmenu.so.6 /lib64/libncurses.so.6 /lib64/libtinfo.so.6 /lib64/libform.so.6 /lib64/libm.so.6 /lib64/libpanel.so.6 /lib64/libfreetype.so.6 /lib64/libhogweed.so.6 /lib64/libtic.so.6 /lib64/libc.so.6 /lib64/libtasn1.so.6 /lib64/libstdc++.so.6 /lib64/libmenu.so.5 /lib64/libsensors.so.5 /lib64/libncurses.so.5 /lib64/libtinfo.so.5 /lib64/libform.so.5 /lib64/libpsl.so.5 /lib64/libpanel.so.5 /lib64/libsubid.so.5 /lib64/libjson-c.so.5 /lib64/liblzma.so.5 /lib64/libapt-pkg-libc6.9-6.so.14 /lib64/libnghttp2.so.14 /lib64/libncurses.so.4 /lib64/libjansson.so.4 /lib64/libcurl.so.4 /lib64/libgssrpc.so.4 /lib64/liblvm2cmd.so.2.03 /lib64/libdevmapper-event-lvm2.so.2.03 /lib64/libpcreposix.so.3 /lib64/libpcre2-posix.so.3 /lib64/libedit.so.3 /lib64/libgdbm_compat.so.3 /lib64/libncurses.so.3 /lib64/libcgroup.so.3 /lib64/libcrypto.so.3 /lib64/libk5crypto.so.3 /lib64/libgumbo.so.3 /lib64/libgdbm.so.3 /lib64/libssl.so.3 /lib64/libnetfilter_conntrack.so.3 /lib64/libpci.so.3 /lib64/libpcre.so.3 /lib64/libtirpc.so.3 /lib64/libmpdec.so.3 /lib64/libkrb5.so.3 /lib64/libsasl2.so.3 /lib64/libgraphite2.so.3 /lib64/libdbus-1.so.3 /lib64/libkadm5srv_mit.so.12 /lib64/libkadm5clnt_mit.so.12 /lib64/libxtables.so.12 /lib64/libcryptsetup.so.12 /lib64/libidn.so.12 /lib64/libdevmapper-event.so.1.02 /lib64/libdevmapper.so.1.02 /lib64/libpsx.so.2 /lib64/libresolv.so.2 /lib64/libnss_compat.so.2 /lib64/libss.so.2 /lib64/libnss_dns.so.2 /lib64/libext2fs.so.2 /lib64/libcares.so.2 /lib64/libnss_files.so.2 /lib64/libcom_err.so.2 /lib64/liblber.so.2 /lib64/libseccomp.so.2 /lib64/libldap.so.2 /lib64/libnss_ldap.so.2 /lib64/libcap.so.2 /lib64/libe2p.so.2 /lib64/libdl.so.2 /lib64/libunistring.so.2 /lib64/libslang.so.2 /lib64/libfuse.so.2 /lib64/libnss_myhostname.so.2 /lib64/libnss_role.so.2 /lib64/libkmod.so.2 /lib64/libnss_hesiod.so.2 /lib64/libnss_systemd.so.2 /lib64/libparted.so.2 /lib64/libip6tc.so.2 /lib64/libip4tc.so.2 /lib64/libjemalloc.so.2 /lib64/libnss_db.so.2 /lib64/libnss_tcb.so.2 /lib64/libgssapi_krb5.so.2 /lib64/ld-linux-x86-64.so.2 /lib64/liblzo2.so.2 /lib64/libxml2.so.2 /lib64/libnftnl.so.11 /lib64/libz.so.1 /lib64/libselinux.so.1 /lib64/libdw.so.1 /lib64/libuv.so.1 /lib64/libudev.so.1 /lib64/librt.so.1 /lib64/libcrypt.so.1 /lib64/libefiboot.so.1 /lib64/libmount.so.1 /lib64/libaudit.so.1 /lib64/libexpat.so.1 /lib64/libpam_userpass.so.1 /lib64/libsmartcols.so.1 /lib64/libkeyutils.so.1 /lib64/libnftables.so.1 /lib64/libgcc_s.so.1 /lib64/libattr.so.1 /lib64/libulockmgr.so.1 /lib64/libefivar.so.1 /lib64/libkeymap.so.1 /lib64/libverto.so.1 /lib64/libaio.so.1 /lib64/libbrotlicommon.so.1 /lib64/libversion.so.1 /lib64/libgpm.so.1 /lib64/libanl.so.1 /lib64/libsha1detectcoll.so.1 /lib64/libutil.so.1 /lib64/libacl.so.1 /lib64/libfdisk.so.1 /lib64/libnvme-mi.so.1 /lib64/libdconf.so.1 /lib64/libelf.so.1 /lib64/libpipeline.so.1 /lib64/libnvme.so.1 /lib64/librole.so.1 /lib64/libkbdfile.so.1 /lib64/libhandle.so.1 /lib64/libBrokenLocale.so.1 /lib64/libzstd.so.1 /lib64/libuuid.so.1 /lib64/libblkid.so.1 /lib64/libpasswdqc.so.1 /lib64/libmagic.so.1 /lib64/libmvec.so.1 /lib64/libefisec.so.1 /lib64/libbrotlidec.so.1 /lib64/libcdb.so.1 /lib64/libthread_db.so.1 /lib64/libsgutils-1.48.so.1 /lib64/liblz4.so.1 /lib64/libbz2.so.1 /lib64/libargon2.so.1 /lib64/libssh2.so.1 /lib64/libproc2.so.1 /lib64/libb2.so.1 /lib64/libgnutls.so.30 /lib64/libgcrypt.so.20 /lib64/libgmp.so.10 /lib64/libkdb5.so.10 /lib64/libharfbuzz.so.0 /lib64/libmpathpersist.so.0 /lib64/libkrb5support.so.0 /lib64/libpopt.so.0 /lib64/libdrop_ambient.so.0 /lib64/libp11-kit.so.0 /lib64/libharfbuzz-subset.so.0 /lib64/liblftp-tasks.so.0 /lib64/liblftp-jobs.so.0 /lib64/libgpg-error.so.0 /lib64/libutempter.so.0 /lib64/libINIReader.so.0 /lib64/libzio.so.0 /lib64/libntlm.so.0 /lib64/libpam.so.0 /lib64/libmnl.so.0 /lib64/libmpathutil.so.0 /lib64/libnfnetlink.so.0 /lib64/libmultipath.so.0 /lib64/libxxhash.so.0 /lib64/libinih.so.0 /lib64/libc_malloc_debug.so.0 /lib64/libcap-ng.so.0 /lib64/libparted-fs-resize.so.0 /lib64/libauparse.so.0 /lib64/libreiserfscore.so.0 /lib64/libsetproctitle.so.0 /lib64/libsystemd.so.0 /lib64/libmpathcmd.so.0 /lib64/libmpathvalid.so.0 /lib64/libkrad.so.0 /lib64/libpthread.so.0 /lib64/libpam_misc.so.0 /lib64/libpamc.so.0 /lib64/libnatspec.so.0 /lib64/liblmdb.so.0 /lib64/libtcb.so.0 /lib64/libpcre2-8.so.0 /lib64/libpcre2-16.so.0 /lib64/libidn2.so.0 /lib64/libpcre2-32.so.0 /lib64/libpolkit-agent-1.so.0 /lib64/libpolkit-gobject-1.so.0 /lib64/libgirepository-2.0.so.0 /lib64/libgobject-2.0.so.0 /lib64/libgio-2.0.so.0 /lib64/libgmodule-2.0.so.0 /lib64/libgthread-2.0.so.0 /lib64/libglib-2.0.so.0 /lib64/libusb-1.0.so.0 /lib64/libtoml.so.1.0  t!§Í           1  /   ldconfig (GNU libc) stable release version 2.38include /etc/ld.so.conf.d/*.conf
+## some useful aliases
+alias dir ls
+alias l "ls -lt"
+alias cd.. "cd .."
+alias q quit
+alias less more
+alias zless zmore
+alias bzless bzmore
+alias reconnect "close; cache flush; cd ."
+
+## make prompt look better
+set prompt "lftp \S\? \u\@\h:\w> "
+## some may prefer colors (contributed by Matthew <mwormald@optusnet.com.au>)
+#set prompt "\[\e[1;30m\][\[\e[0;34m\]f\[\e[1m\]t\[\e[37m\]p\[\e[30m\]] \[\e[34m\]\u\[\e[0;34m\]\@\[\e[1m\]\h\[\e[1;30m\]:\[\e[1;34m\]\w\[\e[1;30m\]>\[\e[0m\] "
+## Uncomment the following two lines to make switch cls and ls, making
+## cls the default.
+#alias ls command cls
+#alias hostls command ls
+
+## default protocol selection
+#set default-protocol/ftp.*	ftp
+#set default-protocol/www.*	http
+#set default-protocol/localhost	file
+
+## this makes lftp faster but doesn't work with some sites/routers
+#set ftp:sync-mode off
+
+## synchronous mode for broken servers and/or routers
+set sync-mode/ftp.idsoftware.com on
+set sync-mode/ftp.microsoft.com on
+set sync-mode/sunsolve.sun.com on
+## extended regex to match first server message for automatic sync-mode.
+set auto-sync-mode "icrosoft FTP Service|MadGoat|MikroTik"
+
+## if default ftp passive mode does not work, try this:
+# set ftp:passive-mode off
+
+## Set this to follow http redirections
+set xfer:max-redirections 10
+
+## Proxy can help to pass a firewall
+## Environment variables ftp_proxy, http_proxy and no_proxy are used to
+## initialize the below variables automatically. You can set them here too.
+##
+## ftp:proxy must communicate with client over ftp protocol, squid won't do.
+## This can be e.g. TIS-FWTK or rftpd. User and password are optional.
+# set ftp:proxy ftp://[user:pass@]your_ftp_proxy:port
+## ...but squid still can be used to access ftp servers, using hftp protocol:
+# set ftp:proxy http://your.squid.address:port
+## ...if squid allows CONNECT to arbitrary ports, then you can use CONNECT
+## instead of hftp:
+# set ftp:use-hftp no
+##
+## no proxy for host
+# set ftp:proxy/local_host ""
+## or domain
+# set ftp:proxy/*.domain.com ...
+##
+## http:proxy must communicate with client over http protocol, e.g. squid.
+## Default port is 3128.
+# set http:proxy your_http_proxy[:port]
+## hftp:proxy must also be an http proxy. It is used for FTP over HTTP access.
+# set hftp:proxy your_http_proxy[:port]
+##
+## net:no-proxy disables proxy usage for list of domains.
+# set net:no-proxy .domain.com,.otherdom.net
+
+## If you don't have direct ftp access, this setting can be useful to select
+## hftp instead of ftp automatically.
+# set ftp:proxy http://your.http.proxy:port
+
+## This can be used for automatic saving of configuration
+# set at-exit "set > ~/.lftp/settings"
+# source ~/.lftp/settings
+
+## and this is for remembring last site
+## (combine with previous rule if you want)
+# set at-exit "bo a last"
+# open last
+
+## Terminal strings to set titlebars for terminals that don't
+## properly specify tsl and fsl capabilities.
+## Use cmd:set-term-status to enable this.
+set cmd:term-status/*screen* "\e_\T\e\\"
+set cmd:term-status/*xterm* "\e[11;0]\e]2;\T\007\e[11]"
+set cmd:term-status/*rxvt* "\e[11;0]\e]2;\T\007\e[11]"
+# set cmd:set-term-status on
+
+## If you don't like advertising lftp or servers hate it, set this:
+# set ftp:anon-pass "mozilla@"
+# set ftp:client ""
+# set http:user-agent "Mozilla/4.7 [en] (WinNT; I)"
+# This is the configuration file for libaudit tunables.
+# It is currently only used for the failure_action tunable.
+
+# failure_action can be: log, ignore, terminate
+failure_action = ignore
+
+
+LANG=ru_RU.UTF-8
+TZif2                                            TZif2                              B      ˇˇˇˇõ_	'ˇˇˇˇ°±ˇˇˇˇˇµ£˝@    'ã∞    ¿     ø0    ˘Û†    ÈÚ∞    €'     Ãw∞    ºÑ–    ¨u–    úf–    åW–    |H–     l9–    !\*–    "L–    #<–    $+˝–    %Ó–    &ﬂ–    'P    'Ù¸P    (‰˚`    )x£`    )‘ﬁP    *ƒœP    +¥¿P    ,§±P    -î¢P    .ÑìP    /tÑP    0duP    1]†–    2r{–    3=Ç–    4R]–    5d–    62?–    6˝F–    8\P    8›(–    9˚>P    :Ω
+–    ;€ P    <¶'P    =ªP    >Ü	P    ?ö‰P    @eÎP    AÑ –    BEÕP    Cc‚–    D%ØP    ECƒ–    FëP    G#¶–    GÓ≠–    Ià–    IŒè–    J„j–    KÆq–    LÃáP    MéS–    TL@  8Ÿ    4¡   8@   T`  FP   FP  T` LMT PMT +04 +06 +05 
+<+05>-5
+# $Id: login.defs,v 1.8 2002/10/24 05:02:53 solar Exp $
+#
+# Please refer to login.defs(5) for more information on this file, the
+# parameters which may be defined here and the corresponding programs.
+#
+
+#
+# Min/max values for automatic UID selection in useradd.
+#
+UID_MIN			1000
+UID_MAX			60000
+
+#
+# Min/max values for automatic GID selection in useradd and groupadd.
+#
+GID_MIN			1000
+GID_MAX			60000
+
+#
+# Don't allow users to change their "real name" and other information
+# using chfn.  The most restrictive setting is better achieved by not
+# installing chfn SUID.
+#
+CHFN_RESTRICT		no
+
+#
+# This defines whether useradd should create home directories for
+# users by default.  This option is OR'ed with the -m flag on useradd
+# command line.
+#
+CREATE_HOME		yes
+
+#
+# The pwck(8) utility emits a warning for any system account with a home
+# directory that does not exist.  Some system accounts intentionally do
+# not have a home directory.  Such accounts may have this string as
+# their home directory in /etc/passwd to avoid a spurious warning.
+#
+NONEXISTENT    /nonexistent
+
+#
+# The mail spool directory.  This is needed to manipulate the mailbox
+# when its corresponding user account is modified or deleted.
+#
+#MAIL_DIR		/var/mail
+
+#
+# Password aging controls:
+#
+#	PASS_MAX_DAYS	Maximum number of days a password may be used.
+#	PASS_MIN_DAYS	Minimum number of days allowed between password changes.
+#	PASS_WARN_AGE	Number of days warning given before a password expires.
+#
+# The default is to not use password aging.
+#
+# These settings are only used at the time of account creation.  They
+# don't affect existing accounts.
+#
+#PASS_MAX_DAYS		99999
+#PASS_MIN_DAYS		0
+#PASS_WARN_AGE		7
+
+#
+# The umask to use when creating user home directories.  The default
+# is 077.
+#
+#UMASK			077
+
+# HOME_MODE is used by useradd(8) and newusers(8) to set the mode for new
+# home directories.
+# If HOME_MODE is not set, the value of UMASK is used to create the mode.
+#HOME_MODE  0700
+
+#
+# If defined, this command is run when removing a user.  It should
+# remove any at/cron/print jobs etc. owned by the user to be removed
+# (passed as the first argument).
+#
+#USERDEL_CMD		/usr/local/sbin/userdel_local
+
+#
+# If set to yes, userdel will remove the user¬¥s group if it contains
+# no more members, and useradd will create by default a group with
+# the name of the user.
+#
+USERGROUPS_ENAB yes
+
+#
+# Enable "syslog" logging of newgrp and sg activity.
+#
+SYSLOG_SG_ENAB      yes
+
+#
+# Allow newuidmap and newgidmap when running under an alternative
+# primary group.
+#
+#GRANT_AUX_GROUP_SUBIDS no
+
+#
+# Select the HMAC cryptography algorithm.
+# Used in pam_timestamp module to calculate the keyed-hash message
+# authentication code.
+#
+# Note: It is recommended to check hmac(3) to see the possible algorithms
+# that are available in your system.
+#
+#HMAC_CRYPTO_ALGO SHA512
+
+#
+# The password hashing method and iteration count to use for group
+# passwords that may be set with gpasswd(1).
+#
+CRYPT_PREFIX		$2a$
+CRYPT_ROUNDS		8
+
+#
+# Whether to use tcb password shadowing scheme.
+#
+USE_TCB			yes
+
+#
+# Whether newly created tcb-style shadow files should be readable by
+# group "auth".
+#
+TCB_AUTH_GROUP		yes
+
+#
+# Whether useradd should create symlinks rather than directories under
+# /etc/tcb for newly created accounts with UIDs over 1000.  See tcb(5)
+# for information on why this may be needed.
+#
+TCB_SYMLINKS		no
+
+#
+# Regular expression to which user/group names must match.
+# If not defined or empty then traditional check will be performed.
+# The default is "^[a-z_][a-z0-9_-]*[$]\?$".
+#
+#REGEXP_NAME		""
+
+#
+# If set to yes then non-ASCII characters in the password database
+# files are not allowed.
+#
+SAFE_PWDB_FIELDS		no
+# see "man logrotate" for details
+
+# global options do not affect preceding include directives
+
+# rotate log files weekly
+weekly
+
+# keep 4 weeks worth of backlogs
+rotate 4
+
+# create new (empty) log files after rotating old ones
+create
+
+# comment this out if you want your log files remain uncompressed
+compress
+
+# do not rotate empty log files
+notifempty
+
+# uncomment this if you want to use date as a suffix for rotated files
+#dateext
+
+# logs are moved into this directory for rotation
+#olddir old
+
+# packages drop log rotation information into this directory
+include /etc/logrotate.d
+
+# system-specific logs may also be configured here.
+6ae232a52f7e8cdf468dbf6768a6f6d3
+# Magic local data for file(1) command.
+# Insert here your local magic data. Format is described in magic(5).
+
+set ask askcc append save crt
+ignore message-id received date fcc status resent-date resent-message-id resent-from in-reply-to
+# man_db.conf
+#
+# This file is used by the man-db package to configure the man and cat paths.
+# It is also used to provide a manpath for those without one by examining
+# their PATH environment variable. For details see the manpath(5) man page.
+#
+# Lines beginning with `#' are comments and are ignored. Any combination of
+# tabs or spaces may be used as `whitespace' separators.
+#
+# There are three mappings allowed in this file:
+# --------------------------------------------------------
+# MANDATORY_MANPATH			manpath_element
+# MANPATH_MAP		path_element	manpath_element
+# MANDB_MAP		global_manpath	[relative_catpath]
+#---------------------------------------------------------
+# every automatically generated MANPATH includes these fields
+#
+#MANDATORY_MANPATH 			/usr/src/pvm3/man
+#
+MANDATORY_MANPATH			/usr/man
+MANDATORY_MANPATH			/usr/share/man
+MANDATORY_MANPATH			/usr/local/share/man
+#---------------------------------------------------------
+# set up PATH to MANPATH mapping
+# ie. what man tree holds man pages for what binary directory.
+#
+#		*PATH*        ->	*MANPATH*
+#
+MANPATH_MAP	/bin			/usr/share/man
+MANPATH_MAP	/usr/bin		/usr/share/man
+MANPATH_MAP	/sbin			/usr/share/man
+MANPATH_MAP	/usr/sbin		/usr/share/man
+MANPATH_MAP	/usr/local/bin		/usr/local/man
+MANPATH_MAP	/usr/local/bin		/usr/local/share/man
+MANPATH_MAP	/usr/local/sbin		/usr/local/man
+MANPATH_MAP	/usr/local/sbin		/usr/local/share/man
+MANPATH_MAP	/usr/X11R6/bin		/usr/X11R6/man
+MANPATH_MAP	/usr/bin/X11		/usr/X11R6/man
+MANPATH_MAP	/usr/games		/usr/share/man
+MANPATH_MAP	/opt/bin		/opt/man
+MANPATH_MAP	/opt/sbin		/opt/man
+#---------------------------------------------------------
+# For a manpath element to be treated as a system manpath (as most of those
+# above should normally be), it must be mentioned below. Each line may have
+# an optional extra string indicating the catpath associated with the
+# manpath. If no catpath string is used, the catpath will default to the
+# given manpath.
+#
+# You *must* provide all system manpaths, including manpaths for alternate
+# operating systems, locale specific manpaths, and combinations of both, if
+# they exist, otherwise the permissions of the user running man/mandb will
+# be used to manipulate the manual pages. Also, mandb will not initialise
+# the database cache for any manpaths not mentioned below unless explicitly
+# requested to do so.
+#
+# In a per-user configuration file, this directive only controls the
+# location of catpaths and the creation of database caches; it has no effect
+# on privileges.
+#
+# Any manpaths that are subdirectories of other manpaths must be mentioned
+# *before* the containing manpath. E.g. /usr/man/preformat must be listed
+# before /usr/man.
+#
+#		*MANPATH*     ->	*CATPATH*
+#
+MANDB_MAP	/usr/man		/var/cache/man/fsstnd
+MANDB_MAP	/usr/share/man		/var/cache/man
+MANDB_MAP	/usr/local/man		/var/cache/man/oldlocal
+MANDB_MAP	/usr/local/share/man	/var/cache/man/local
+MANDB_MAP	/usr/X11R6/man		/var/cache/man/X11R6
+MANDB_MAP	/opt/man		/var/cache/man/opt
+MANDB_MAP	/snap/man		/var/cache/man/snap
+#
+#---------------------------------------------------------
+# Program definitions.  These are commented out by default as the value
+# of the definition is already the default.  To change: uncomment a
+# definition and modify it.
+#
+#DEFINE 	pager	less
+#DEFINE 	cat	cat
+#DEFINE 	tr	tr '\255\267\264\327' '\055\157\047\170'
+#DEFINE		grep	grep
+#DEFINE 	troff 	groff -mandoc
+#DEFINE 	nroff 	nroff -mandoc
+#DEFINE 	eqn 	eqn
+#DEFINE 	neqn	neqn
+#DEFINE 	tbl 	tbl
+#DEFINE 	col 	col
+#DEFINE 	vgrind 	
+#DEFINE 	refer 	refer
+#DEFINE 	grap 	
+#DEFINE 	pic 	pic -S
+#
+#DEFINE		compressor	gzip -c7
+#---------------------------------------------------------
+# Misc definitions: same as program definitions above.
+#
+#DEFINE		whatis_grep_flags		-i
+#DEFINE		apropos_grep_flags		-iEw
+#DEFINE		apropos_regex_grep_flags	-iE
+#---------------------------------------------------------
+# Section names. Manual sections will be searched in the order listed here;
+# the default is 1, n, l, 8, 3, 0, 2, 3type, 5, 4, 9, 6, 7. Multiple SECTION
+# directives may be given for clarity, and will be concatenated together in
+# the expected way.
+# If a particular extension is not in this list (say, 1mh), it will be
+# displayed with the rest of the section it belongs to. The effect of this
+# is that you only need to explicitly list extensions if you want to force a
+# particular order. Sections with extensions should usually be adjacent to
+# their main section (e.g. "1 1mh 8 ...").
+#
+SECTION		1 1p 8 2 3 3p 4 5 6 7 9 0p n l p o 1x 2x 3x 4x 5x 6x 7x 8x
+#
+#---------------------------------------------------------
+# Range of terminal widths permitted when displaying cat pages. If the
+# terminal falls outside this range, cat pages will not be created (if
+# missing) or displayed.
+#
+#MINCATWIDTH	80
+#MAXCATWIDTH	80
+#
+# If CATWIDTH is set to a non-zero number, cat pages will always be
+# formatted for a terminal of the given width, regardless of the width of
+# the terminal actually being used. This should generally be within the
+# range set by MINCATWIDTH and MAXCATWIDTH.
+#
+#CATWIDTH	0
+#
+#---------------------------------------------------------
+# Flags.
+# NOCACHE keeps man from creating cat pages.
+#NOCACHE
+#
+#  /etc/mdadm.conf  --  mdadm configuration file
+#
+#  Customized for ALTLinux
+#  See complete sample on manual page and in documentation directory
+#
+#  This is a minimalistic skeleton but it should work out-of:a+box!
+#
+
+MAILADDR root
+PROGRAM /sbin/mdadm-syslog-events
+DEVICE partitions
+
+## EOF ##
+[defaults]
+	base_features = sparse_super,large_file,filetype,resize_inode,dir_index,ext_attr
+	default_mntopts = acl,user_xattr
+	enable_periodic_fsck = 0
+	blocksize = 4096
+	inode_size = 256
+	inode_ratio = 16384
+
+[fs_types]
+	ext3 = {
+		features = has_journal
+	}
+	ext4 = {
+		features = has_journal,extent,huge_file,flex_bg,metadata_csum,metadata_csum_seed,64bit,dir_nlink,extra_isize,orphan_file
+	}
+	small = {
+		blocksize = 1024
+		inode_ratio = 4096
+	}
+	floppy = {
+		blocksize = 1024
+		inode_ratio = 8192
+	}
+	big = {
+		inode_ratio = 32768
+	}
+	huge = {
+		inode_ratio = 65536
+	}
+	news = {
+		inode_ratio = 4096
+	}
+	largefile = {
+		inode_ratio = 1048576
+		blocksize = -1
+	}
+	largefile4 = {
+		inode_ratio = 4194304
+		blocksize = -1
+	}
+	hurd = {
+	     blocksize = 4096
+	     inode_size = 128
+	     warn_y2038_dates = 0
+	}
+# /etc/modules-load.d/modules.conf: kernel modules to load at boot time.
+#
+# This file should contain the names of kernel modules that are
+# to be loaded at boot time, one per line.  Comments begin with
+# a `#', and everything on the line after them are ignored.
+
+# This reads all module names listed in /etc/modules-load.d/?*.conf and
+# loads them into the kernel. This follows roughly Debian's way to
+# handle modules, but uses a directory of fragments instead of a
+# single /etc/modules file. */
+tun
+udevfs /dev devtmpfs rw,relatime,size=5120k,nr_inodes=84252,mode=755,inode64 0 0
+runfs /run tmpfs rw,relatime,mode=755,inode64 0 0
+/dev/sda2 / ext4 rw,relatime 0 0
+proc /proc proc rw,nosuid,noexec,relatime,gid=19 0 0
+sysfs /sys sysfs rw,nosuid,nodev,noexec,relatime 0 0
+securityfs /sys/kernel/security securityfs rw,nosuid,nodev,noexec,relatime 0 0
+tmpfs /dev/shm tmpfs rw,nosuid,nodev,inode64 0 0
+devpts /dev/pts devpts rw,nosuid,noexec,relatime,gid=5,mode=620,ptmxmode=666 0 0
+cgroup2 /sys/fs/cgroup cgroup2 rw,nosuid,nodev,noexec,relatime,nsdelegate,memory_recursiveprot 0 0
+pstore /sys/fs/pstore pstore rw,nosuid,nodev,noexec,relatime 0 0
+bpf /sys/fs/bpf bpf rw,nosuid,nodev,noexec,relatime,mode=700 0 0
+systemd-1 /proc/sys/fs/binfmt_misc autofs rw,relatime,fd=31,pgrp=1,timeout=0,minproto=5,maxproto=5,direct,pipe_ino=4682 0 0
+hugetlbfs /dev/hugepages hugetlbfs rw,nosuid,nodev,relatime,pagesize=2M 0 0
+mqueue /dev/mqueue mqueue rw,nosuid,nodev,noexec,relatime 0 0
+debugfs /sys/kernel/debug debugfs rw,nosuid,nodev,noexec,relatime 0 0
+tracefs /sys/kernel/tracing tracefs rw,nosuid,nodev,noexec,relatime 0 0
+fusectl /sys/fs/fuse/connections fusectl rw,nosuid,nodev,noexec,relatime 0 0
+configfs /sys/kernel/config configfs rw,nosuid,nodev,noexec,relatime 0 0
+tmpfs /tmp tmpfs rw,nosuid,relatime,inode64 0 0
+tmpfs /run/user/1000 tmpfs rw,nosuid,nodev,relatime,size=69100k,nr_inodes=17275,mode=700,uid=1000,gid=1000,inode64 0 0
+# Copyright 1996-1998,2001,2002 Alain Knaff.
+# This file is part of mtools.
+#
+# Mtools is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Mtools is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Mtools.  If not, see <http://www.gnu.org/licenses/>.
+
+# Example mtools.conf files.  Uncomment the lines which correspond to
+# your architecture and comment out the "SAMPLE FILE" line below
+
+# Linux floppy drives
+drive a: file="/dev/fd0" exclusive 1.44m mformat_only
+drive b: file="/dev/fd1" exclusive 1.44m mformat_only
+
+# First SCSI hard disk partition
+#drive c: file="/dev/sda1"
+
+# First IDE hard disk partition
+#drive c: file="/dev/hda1"
+
+# # dosemu floppy image
+# drive m: file="/var/lib/dosemu/diskimage"
+
+# dosemu hdimage
+drive n: file="/var/lib/dosemu/hdimage" offset=8832
+
+# # Atari ramdisk image
+# drive o: file="/tmp/atari_rd" offset=136
+
+# # ZIP disk for Solaris:
+# Drive X is ZIP-100 at target 5
+# drive X: file="/dev/rdsk/c0t5d0s2" partition=4 scsi=1 nodelay
+
+# # ZIP disk for SunOS:
+# # Zip drive is at target 5, which default kernel calls tape st1 !!
+# drive Y: file="/dev/rsd5c" partition=4 scsi=1 nodelay
+
+# # autoselect zip drive/floppy on HP-UX 9/10
+#    drive a: file="/dev/rdsk/c201d5"      exclusive partition=4
+#    drive a: file="/dev/rdsk/c201d5s0"    exclusive partition=4
+#    drive a: file="/dev/rfloppy/c201d0s0" exclusive
+
+#          A/UX target 5 on 1st scsi bus   jaz or zip
+# drive X: file="/dev/rdsk/c105d0s31"      partition=4
+
+
+# Some examples for BeOS.
+# floppy drive. hardcoded in devices.c, so no real need to define it here
+#drive a: file="/dev/floppy_disk" exclusive
+# ZIP drive on SCSI ID 6
+#drive z: file="/dev/scsi_disk_060" offset=16384 fat_bits=16                        
+
+# SCO Unix 3.2v4
+# # Floppy disk drives
+#
+# drive a: file="/dev/install" exclusive
+# drive b: file="/dev/install1" exclusive
+#  
+# # SCSI hard disk partitions
+#  
+# drive c: file="/dev/dsk/0sC"
+# drive d: file="/dev/dsk/0sD"
+# drive e: file="/dev/dsk/0sE"
+# drive f: file="/dev/dsk/0sF"
+# drive g: file="/dev/dsk/0sG"
+# drive h: file="/dev/dsk/0sH"
+
+# # uncomment the following line to display all file names in lower
+# # case by default
+# mtools_lower_case=1
+# This is a basic configuration file with some examples, for device mapper
+# multipath.
+#
+# For a complete list of the default configuration values, run either
+# multipath -t
+# or
+# multipathd show config
+#
+# For a list of configuration options with descriptions, see the multipath.conf
+# man page
+
+## Use user friendly names, instead of using WWIDs as names.
+defaults {
+    user_friendly_names yes
+    find_multipaths yes
+}
+
+#blacklist {
+#       wwid 26353900f02796769
+#       devnode "^(ram|raw|loop|fd|md|dm-|sr|scd|st)[0-9]*"
+#       devnode "^hd[a-z]"
+#}
+
+#multipaths {
+#       multipath {
+#               wwid                    3600508b4000156d700012000000b0000
+#               alias                   yellow
+#               path_grouping_policy    multibus
+#               path_checker            readsector0
+#               path_selector           "round-robin 0"
+#               failback                manual
+#               rr_weight               priorities
+#               no_path_retry           5
+#       }
+#       multipath {
+#               wwid                    1DEC_____321816758474
+#               alias                   red
+#       }
+#}
+
+#devices {
+#       device {
+#               vendor                  "COMPAQ  "
+#               product                 "HSV110 (C)COMPAQ"
+#               path_grouping_policy    multibus
+#               path_checker            readsector0
+#               path_selector           "round-robin 0"
+#               hardware_handler        "0"
+#               failback                15
+#               rr_weight               priorities
+#               no_path_retry           queue
+#       }
+#       device {
+#               vendor                  "COMPAQ  "
+#               product                 "MSA1000         "
+#               path_grouping_policy    multibus
+#       }
+#}
+// This is the primary configuration file for the BIND DNS server named.
+//
+// If you are just adding zones, please do that in /var/lib/bind/etc/bind/local.conf
+
+include "/etc/bind/options.conf";
+include "/etc/bind/rndc.conf";
+include "/etc/bind/local.conf";
+## Sample initialization file for GNU nano.
+##
+## For the options that take parameters, the default value is shown.
+## Other options are unset by default.  To make sure that an option
+## is disabled, you can use "unset <option>".
+##
+## Characters that are special in a shell should not be escaped here.
+## Inside string parameters, quotes should not be escaped -- the last
+## double quote on the line will be seen as the closing quote.
+
+## If you want ^F, ^B, M-F and M-B to do what they did before version 8.0:
+# bind ^F forward main
+# bind ^B back main
+# bind M-F formatter main
+# bind M-B linter main
+
+## Make 'nextword' (Ctrl+Right) and 'chopwordright' (Ctrl+Delete)
+## stop at word ends instead of at beginnings.
+# set afterends
+
+## When soft line wrapping is enabled, make it wrap lines at blanks
+## (tabs and spaces) instead of always at the edge of the screen.
+# set atblanks
+
+## Automatically indent a newly created line to the same number of
+## tabs and/or spaces as the preceding line -- or as the next line
+## if the preceding line is the beginning of a paragraph.
+# set autoindent
+
+## Back up files to the current filename plus a tilde.
+# set backup
+
+## The directory to put unique backup files in.
+# set backupdir ""
+
+## Use bold text instead of reverse video text.
+# set boldtext
+
+## Treat any line with leading whitespace as the beginning of a paragraph.
+# set bookstyle
+
+## The characters treated as closing brackets when justifying paragraphs.
+## This may not include any blank characters.  Only closing punctuation,
+## optionally followed by these closing brackets, can end sentences.
+# set brackets ""')>]}"
+
+## Automatically hard-wrap the current line when it becomes overlong.
+# set breaklonglines
+
+## Do case-sensitive searches by default.
+# set casesensitive
+
+## Constantly display the cursor position in the status bar or minibar.
+# set constantshow
+
+## Use cut-from-cursor-to-end-of-line by default.
+# set cutfromcursor
+
+## Do not use the line below the title bar, leaving it entirely blank.
+# set emptyline
+
+## Set the target width for automatic hard-wrapping and for justifying
+## paragraphs.  If the specified value is 0 or less, the wrapping point
+## will be the terminal's width minus this number.
+# set fill -8
+
+## Draw a vertical stripe at the given column, to help judge text width.
+## (This option does not have a default value.)
+# set guidestripe 75
+
+## Remember the used search/replace strings for the next session.
+# set historylog
+
+## Display a "scrollbar" on the righthand side of the edit window.
+# set indicator
+
+## Scroll the buffer contents per half-screen instead of per line.
+# set jumpyscrolling
+
+## Display line numbers to the left (and any anchors in the margin).
+# set linenumbers
+
+## Enable vim-style lock-files.  This is just to let a vim user know you
+## are editing a file [s]he is trying to edit and vice versa.  There are
+## no plans to implement vim-style undo state in these files.
+# set locking
+
+## Fall back to slow libmagic to try and determine an applicable syntax.
+# set magic
+
+## The opening and closing brackets that are found by a matching-bracket
+## search.  This may not contain blank characters.  The opening brackets
+## must come before the closing ones, and they must be in the same order.
+# set matchbrackets "(<[{)>]}"
+
+## Suppress the title bar and show the filename plus a cursor-position
+## percentage in the space of the status bar.
+# set minibar
+
+## Enable mouse support, if available for your system.  When enabled,
+## mouse clicks can be used to place the cursor, set the mark (with a
+## double click), and execute shortcuts.  The mouse will work in the
+## X Window System, and on the console when gpm is running.
+# set mouse
+
+## Switch on multiple file buffers (inserting a file will put it into
+## a separate buffer).
+# set multibuffer
+
+## Don't convert files from DOS/Mac format.
+# set noconvert
+
+## Don't display the helpful shortcut lists at the bottom of the screen.
+# set nohelp
+
+## Don't automatically add a newline when a file does not end with one.
+# set nonewlines
+
+## Set operating directory.  nano will not read or write files outside
+## this directory and its subdirectories.  Also, the current directory
+## is changed to here, so any files are inserted from this dir.  A blank
+## string means the operating-directory feature is turned off.
+# set operatingdir ""
+
+## Remember the cursor position in each file for the next editing session.
+# set positionlog
+
+## Preserve the XON and XOFF keys (^Q and ^S).
+# set preserve
+
+## The characters treated as closing punctuation when justifying paragraphs.
+## This may not contain blank characters.  Only these closing punctuations,
+## optionally followed by closing brackets, can end sentences.
+# set punct "!.?"
+
+## Make status-bar messages disappear after 1 keystroke instead of after 20.
+# set quickblank
+
+## The regular expression that matches quoting characters in email
+## or line-comment introducers in source code.  The default is:
+# set quotestr "^([ 	]*([!#%:;>|}]|//))+"
+
+## Try to work around a mismatching terminfo terminal description.
+# set rawsequences
+
+## Fix Backspace/Delete confusion problem.
+# set rebinddelete
+
+## Do regular-expression searches by default.
+## Regular expressions are of the extended type (ERE).
+# set regexp
+
+## Save a changed buffer automatically on exit; don't prompt.
+# set saveonexit
+
+## Put the cursor on the highlighted item in the file browser, and
+## show the cursor in the help viewer; useful for people who use a
+## braille display and people with poor vision.
+# set showcursor
+
+## Make the Home key smarter: when Home is pressed anywhere but at the
+## very beginning of non-whitespace characters on a line, the cursor
+## will jump to that beginning (either forwards or backwards).  If the
+## cursor is already at that position, it will jump to the true start
+## of the line (the left edge).
+# set smarthome
+
+## Spread overlong lines over multiple screen lines.
+# set softwrap
+
+## Use this spelling checker instead of the internal one.  This option
+## does not have a default value.
+# set speller "aspell -x -c"
+
+## Use the end of the title bar for some state flags: I = auto-indenting,
+## M = mark, L = hard-wrapping long lines, R = recording, S = soft-wrapping.
+# set stateflags
+
+## Use this tab size instead of the default; it must be greater than 0.
+# set tabsize 8
+
+## Convert each typed tab to the fitting number of spaces.
+# set tabstospaces
+
+## Snip whitespace at the end of lines when justifying or hard-wrapping.
+# set trimblanks
+
+## Save files by default in Unix format (also when they were DOS or Mac).
+# set unix
+
+## The two single-column characters used to display the first characters
+## of tabs and spaces.  187 in ISO 8859-1 (0000BB in Unicode) and 183 in
+## ISO-8859-1 (0000B7 in Unicode) seem to be good values for these.
+## The default when in a UTF-8 locale:
+# set whitespace "¬ª¬∑"
+## The default otherwise:
+# set whitespace ">."
+
+## Detect word boundaries differently by treating punctuation
+## characters as parts of words.
+# set wordbounds
+
+## The characters (besides alphanumeric ones) that should be considered
+## as parts of words.  This option does not have a default value.  When
+## set, it overrides option 'set wordbounds'.
+# set wordchars "<_>."
+
+## Let an unmodified Backspace or Delete erase the marked region (instead
+## of a single character, and without affecting the cutbuffer).
+# set zap
+
+## Hide the bars plus help lines and use the whole terminal as edit area.
+# set zero
+
+
+## Paint the interface elements of nano.  These are examples; there are
+## no colors by default, except for errorcolor and spotlightcolor.
+# set titlecolor bold,white,blue
+# set promptcolor lightwhite,grey
+# set statuscolor bold,white,green
+# set errorcolor bold,white,red
+# set spotlightcolor black,lightyellow
+# set selectedcolor lightwhite,magenta
+# set stripecolor ,#444
+# set scrollercolor cyan
+# set numbercolor cyan
+# set keycolor cyan
+# set functioncolor green
+
+## In root's .nanorc you might want to use:
+# set titlecolor bold,white,magenta
+# set promptcolor black,yellow
+# set statuscolor bold,white,magenta
+# set errorcolor bold,white,red
+# set spotlightcolor black,orange
+# set selectedcolor lightwhite,cyan
+# set stripecolor ,yellow
+# set scrollercolor magenta
+# set numbercolor magenta
+# set keycolor lightmagenta
+# set functioncolor magenta
+
+
+## === Syntax coloring ===
+## For all details, see 'man nanorc', section SYNTAX HIGHLIGHTING.
+
+## To include most of the existing syntax definitions, you can do:
+include "/usr/share/nano/*.nanorc"
+
+## Or you can select just the ones you need.  For example:
+include "/usr/share/nano/html.nanorc"
+include "/usr/share/nano/python.nanorc"
+include "/usr/share/nano/sh.nanorc"
+
+## In /usr/share/nano/extra/ you can find some syntaxes that are
+## specific for certain distros or for some less common languages.
+
+
+## If <Tab> should always produce four spaces when editing a Python file,
+## independent of the settings of 'tabsize' and 'tabstospaces':
+# extendsyntax python tabgives "    "
+
+
+## === Key bindings ===
+## For all details, see 'man nanorc', section REBINDING KEYS.
+
+## If you want to suspend nano with one keystroke (instead of with ^T^Z):
+# bind ^Z suspend main
+
+## The <Ctrl+Delete> keystroke deletes the word to the right of the cursor.
+## On some terminals the <Ctrl+Backspace> keystroke produces ^H, which is
+## the ASCII character for backspace, so it is bound by default to the
+## backspace function.  The <Backspace> key itself produces a different
+## keycode, which is hard-bound to the backspace function.  So, if you
+## normally use <Backspace> for backspacing and not ^H, you can make
+## <Ctrl+Backspace> delete the word to the left of the cursor with:
+# bind ^H chopwordleft main
+
+## For a more mnemonic Comment keystroke (overriding Cut-from-cursor):
+# bind M-K comment main
+
+## If you want ^L to just refresh the screen and not center the cursor:
+# bind ^L refresh main
+
+## When you sometimes type M-J instead of M-K, or M-T instead of M-R:
+# unbind M-J main
+# unbind M-T main
+## (Those functions are still accessible through ^T^J and ^T^V.)
+
+## For quickly uppercasing or lowercasing the word under or after the cursor.
+## (These effectively select a word and pipe it through a sed command.)
+# bind Sh-M-U "{nextword}{mark}{prevword}{execute}|sed 's/.*/\U&/'{enter}" main
+# bind Sh-M-L "{nextword}{mark}{prevword}{execute}|sed 's/.*/\L&/'{enter}" main
+
+## For copying a marked region to the system clipboard:
+# bind Sh-M-C "{execute}|xsel -ib{enter}{undo}" main
+
+## For normalizing Unicode to precomposed characters:
+# bind Sh-M-N "{execute}| uconv -x nfc {enter}" main
+
+## For snipping trailing blanks when you save a file:
+# bind ^S "{execute}| sed 's/\s\+$//' {enter}{savefile}" main
+
+## If you would like nano to have keybindings that are more "usual",
+## such as ^O for Open, ^F for Find, ^H for Help, and ^Q for Quit,
+## then uncomment these:
+# bind ^X cut main
+# bind ^C copy main
+# bind ^V paste all
+# bind ^Q exit all
+# bind ^S savefile main
+# bind ^W writeout main
+# bind ^O insert main
+# set multibuffer
+# bind ^H help all
+# bind ^H exit help
+# bind ^F whereis all
+# bind ^G findnext all
+# bind ^B wherewas all
+# bind ^D findprevious all
+# bind ^R replace main
+# unbind ^U all
+# unbind ^N main
+# unbind ^Y all
+# unbind M-J main
+# unbind M-T main
+# bind ^A mark main
+# bind ^P location main
+# bind ^T gotoline main
+# bind ^T gotodir browser
+# bind ^T cutrestoffile execute
+# bind ^L linter execute
+# bind ^E execute main
+# bind ^K "{mark}{end}{zap}" main
+# bind ^U "{mark}{home}{zap}" main
+# bind ^Z undo main
+# bind ^Y redo main
+#
+# The network configuration file. This file is currently only used in
+# conjunction with the TI-RPC code in the libtirpc library.
+#
+# Entries consist of:
+#
+#       <network_id> <semantics> <flags> <protofamily> <protoname> \
+#               <device> <nametoaddr_libs>
+#
+# The <device> and <nametoaddr_libs> fields are always empty in this
+# implementation.
+#
+udp        tpi_clts      v     inet     udp     -       -
+tcp        tpi_cots_ord  v     inet     tcp     -       -
+udp6       tpi_clts      v     inet6    udp     -       -
+tcp6       tpi_cots_ord  v     inet6    tcp     -       -
+rawip      tpi_raw       -     inet      -      -       -
+local      tpi_cots_ord  -     loopback  -      -       -
+unix       tpi_cots_ord  -     loopback  -      -       -
+#
+# /etc/nscd.conf
+#
+# An example Name Service Cache config file.  This file is needed by nscd.
+#
+# WARNING: Running nscd with a secondary caching service like sssd may lead to
+#          unexpected behaviour, especially with how long entries are cached.
+#
+# Legal entries are:
+#
+#	logfile			<file>
+#	debug-level		<level>
+#	threads			<initial #threads to use>
+#	max-threads		<maximum #threads to use>
+#	server-user             <user to run server as instead of root>
+#		server-user is ignored if nscd is started with -S parameters
+#       stat-user               <user who is allowed to request statistics>
+#	reload-count		unlimited|<number>
+#	paranoia		<yes|no>
+#	restart-interval	<time in seconds>
+#
+#       enable-cache		<service> <yes|no>
+#	positive-time-to-live	<service> <time in seconds>
+#	negative-time-to-live   <service> <time in seconds>
+#       suggested-size		<service> <prime number>
+#	check-files		<service> <yes|no>
+#	persistent		<service> <yes|no>
+#	shared			<service> <yes|no>
+#	NOTE: Setting 'shared' to a value of 'yes' will accelerate the lookup,
+#	      but those lookups will not be counted as cache hits
+#	      i.e. 'nscd -g' may show '0%'.
+#	max-db-size		<service> <number bytes>
+#	auto-propagate		<service> <yes|no>
+#
+# Currently supported cache names (services): passwd, group, hosts, services, netgroup
+#
+
+
+#	logfile			/var/log/nscd.log
+#	threads			4
+#	max-threads		32
+	server-user		nscd
+#	stat-user		somebody
+	debug-level		0
+#	reload-count		5
+	paranoia		no
+#	restart-interval	3600
+
+	enable-cache		passwd		yes
+	positive-time-to-live	passwd		600
+	negative-time-to-live	passwd		20
+	suggested-size		passwd		211
+	check-files		passwd		yes
+	persistent		passwd		yes
+	shared			passwd		yes
+	max-db-size		passwd		33554432
+	auto-propagate		passwd		yes
+
+	enable-cache		group		yes
+	positive-time-to-live	group		3600
+	negative-time-to-live	group		60
+	suggested-size		group		211
+	check-files		group		yes
+	persistent		group		yes
+	shared			group		yes
+	max-db-size		group		33554432
+	auto-propagate		group		yes
+
+	enable-cache		hosts		no
+	positive-time-to-live	hosts		3600
+	negative-time-to-live	hosts		20
+	suggested-size		hosts		211
+	check-files		hosts		yes
+	persistent		hosts		yes
+	shared			hosts		yes
+	max-db-size		hosts		33554432
+
+	enable-cache		services	yes
+	positive-time-to-live	services	28800
+	negative-time-to-live	services	20
+	suggested-size		services	211
+	check-files		services	yes
+	persistent		services	yes
+	shared			services	yes
+	max-db-size		services	33554432
+
+	enable-cache		netgroup	yes
+	positive-time-to-live	netgroup	28800
+	negative-time-to-live	netgroup	20
+	suggested-size		netgroup	211
+	check-files		netgroup	yes
+	persistent		netgroup	yes
+	shared			netgroup	yes
+	max-db-size		netgroup	33554432
+# This is the configuration file for the LDAP nameservice
+# switch library's nslcd daemon. It configures the mapping
+# between NSS names (see /etc/nsswitch.conf) and LDAP
+# information in the directory.
+# See the manual page nslcd.conf(5) for more information.
+
+# The user and group nslcd should run as.
+uid _nslcd
+gid _nslcd
+
+# The uri pointing to the LDAP server to use for name lookups.
+# Multiple entries may be specified. The address that is used
+# here should be resolvable without using LDAP (obviously).
+#uri ldap://127.0.0.1/
+#uri ldaps://127.0.0.1/
+#uri ldapi://%2fvar%2frun%2fldapi_sock/
+# Note: %2f encodes the '/' used as directory separator
+uri ldap://127.0.0.1/
+
+# The LDAP version to use (defaults to 3
+# if supported by client library)
+#ldap_version 3
+
+# The distinguished name of the search base.
+base dc=example,dc=com
+
+# The distinguished name to bind to the server with.
+# Optional: default is to bind anonymously.
+#binddn cn=proxyuser,dc=example,dc=com
+
+# The credentials to bind with.
+# Optional: default is no credentials.
+# Note that if you set a bindpw you should check the permissions of this file.
+#bindpw secret
+
+# The distinguished name to perform password modifications by root by.
+#rootpwmoddn cn=admin,dc=example,dc=com
+
+# The default search scope.
+#scope sub
+#scope one
+#scope base
+
+# Customize certain database lookups.
+#base   group  ou=Groups,dc=example,dc=com
+#base   passwd ou=People,dc=example,dc=com
+#base   shadow ou=People,dc=example,dc=com
+#scope  group  onelevel
+#scope  hosts  sub
+
+# Bind/connect timelimit.
+#bind_timelimit 30
+
+# Search timelimit.
+#timelimit 30
+
+# Idle timelimit. nslcd will close connections if the
+# server has not been contacted for the number of seconds.
+#idle_timelimit 3600
+
+# Use StartTLS without verifying the server certificate.
+#ssl start_tls
+tls_reqcert never
+
+# CA certificates for server certificate verification
+#tls_cacertdir /etc/ssl/certs
+#tls_cacertfile /etc/ssl/ca.cert
+
+# Certificate Revocation List (CRL), requires TLS_CACERTDIR parameter to be set
+#tls_crlcheck all
+
+# Seed the PRNG if /dev/urandom is not provided
+#tls_randfile /var/run/egd-pool
+
+# SSL cipher suite
+# See man ciphers for syntax
+#tls_ciphers TLSv1
+
+# Client certificate and key
+# Use these, if your server requires client authentication.
+#tls_cert
+#tls_key
+
+# Mappings for Services for UNIX 3.5
+#filter passwd (objectClass=User)
+#map    passwd uid              msSFU30Name
+#map    passwd userPassword     msSFU30Password
+#map    passwd homeDirectory    msSFU30HomeDirectory
+#map    passwd homeDirectory    msSFUHomeDirectory
+#filter shadow (objectClass=User)
+#map    shadow uid              msSFU30Name
+#map    shadow userPassword     msSFU30Password
+#filter group  (objectClass=Group)
+#map    group  member           msSFU30PosixMember
+
+# Mappings for Services for UNIX 2.0
+#filter passwd (objectClass=User)
+#map    passwd uid              msSFUName
+#map    passwd userPassword     msSFUPassword
+#map    passwd homeDirectory    msSFUHomeDirectory
+#map    passwd gecos            msSFUName
+#filter shadow (objectClass=User)
+#map    shadow uid              msSFUName
+#map    shadow userPassword     msSFUPassword
+#map    shadow shadowLastChange pwdLastSet
+#filter group  (objectClass=Group)
+#map    group  member           posixMember
+
+# Mappings for Active Directory
+#pagesize 1000
+#referrals off
+#idle_timelimit 800
+#filter passwd (&(objectClass=user)(!(objectClass=computer))(uidNumber=*)(unixHomeDirectory=*))
+#map    passwd uid              sAMAccountName
+#map    passwd homeDirectory    unixHomeDirectory
+#map    passwd gecos            displayName
+#filter shadow (&(objectClass=user)(!(objectClass=computer))(uidNumber=*)(unixHomeDirectory=*))
+#map    shadow uid              sAMAccountName
+#map    shadow shadowLastChange pwdLastSet
+#filter group  (objectClass=group)
+
+# Alternative mappings for Active Directory
+# (replace the SIDs in the objectSid mappings with the value for your domain)
+#pagesize 1000
+#referrals off
+#idle_timelimit 800
+#filter passwd (&(objectClass=user)(objectClass=person)(!(objectClass=computer)))
+#map    passwd uid           cn
+#map    passwd uidNumber     objectSid:S-1-5-21-3623811015-3361044348-30300820
+#map    passwd gidNumber     objectSid:S-1-5-21-3623811015-3361044348-30300820
+#map    passwd homeDirectory "/home/$cn"
+#map    passwd gecos         displayName
+#map    passwd loginShell    "/bin/bash"
+#filter group (|(objectClass=group)(objectClass=person))
+#map    group gidNumber      objectSid:S-1-5-21-3623811015-3361044348-30300820
+
+# Mappings for AIX SecureWay
+#filter passwd (objectClass=aixAccount)
+#map    passwd uid              userName
+#map    passwd userPassword     passwordChar
+#map    passwd uidNumber        uid
+#map    passwd gidNumber        gid
+#filter group  (objectClass=aixAccessGroup)
+#map    group  cn               groupName
+#map    group  gidNumber        gid
+# This comment prevents repeated auto-migration of settings.
+#
+# Please refer to nsswitch.conf(5) for more information on this file.
+#
+# This is the Name Service Switch configuration file.  This file should
+# be sorted with the most-used databases at the beginning.
+#
+# Specifying '[NOTFOUND=return]' means that the search for an entry
+# should stop if the search with the previous service turned up nothing.
+# Note that if the search failed due to some other reason (like no NIS
+# server responding) then the search continues with the next service.
+#
+# Legal name services are:
+#
+#	files			Use local files
+#	tcb			Use local tcb shadow files, see tcb(5)
+#	db			Use local database files under /var/db
+#	nis or yp		Use NIS (NIS version 2), also called YP
+#	nisplus or nis+		Use NIS+ (NIS version 3)
+#	dns			Use DNS (Domain Name Service)
+#	compat			Use NIS in compatibility mode
+#	hesiod			Use Hesiod for user lookups
+#	[NOTFOUND=return]	Stop searching if not found so far
+#
+
+passwd:     files systemd
+shadow:     tcb files
+group:      files systemd role
+gshadow:    files
+
+hosts:      files myhostname dns
+
+# To use db, put the "db" in front of "files" for things you want to be
+# looked up first in the db files.
+#
+#passwd:    db files nisplus nis
+#shadow:    db tcb files nisplus nis
+#group:     db files nisplus nis
+#
+#hosts:     db files nisplus nis dns
+
+ethers:     files
+netmasks:   files
+networks:   files
+protocols:  files
+rpc:        files
+services:   files
+
+# Example - obey only what nisplus tells us...
+#services:  nisplus [NOTFOUND=return] files
+#networks:  nisplus [NOTFOUND=return] files
+#protocols: nisplus [NOTFOUND=return] files
+#rpc:       nisplus [NOTFOUND=return] files
+#ethers:    nisplus [NOTFOUND=return] files
+#netmasks:  nisplus [NOTFOUND=return] files
+#bootparams: nisplus [NOTFOUND=return] files
+#netgroup:   nisplus
+#publickey:  nisplus
+
+automount:  files
+aliases:    files
+#
+# Please refer to nsswitch.conf(5) for more information on this file.
+#
+# This is the Name Service Switch configuration file.  This file should
+# be sorted with the most-used databases at the beginning.
+#
+# Specifying '[NOTFOUND=return]' means that the search for an entry
+# should stop if the search with the previous service turned up nothing.
+# Note that if the search failed due to some other reason (like no NIS
+# server responding) then the search continues with the next service.
+#
+# Legal name services are:
+#
+#	files			Use local files
+#	tcb			Use local tcb shadow files, see tcb(5)
+#	db			Use local database files under /var/db
+#	nis or yp		Use NIS (NIS version 2), also called YP
+#	nisplus or nis+		Use NIS+ (NIS version 3)
+#	dns			Use DNS (Domain Name Service)
+#	compat			Use NIS in compatibility mode
+#	hesiod			Use Hesiod for user lookups
+#	[NOTFOUND=return]	Stop searching if not found so far
+#
+
+passwd:     files
+shadow:     tcb files
+group:      files role
+gshadow:    files
+
+hosts:      files myhostname dns
+
+# To use db, put the "db" in front of "files" for things you want to be
+# looked up first in the db files.
+#
+#passwd:    db files nisplus nis
+#shadow:    db tcb files nisplus nis
+#group:     db files nisplus nis
+#
+#hosts:     db files nisplus nis dns
+
+ethers:     files
+netmasks:   files
+networks:   files
+protocols:  files
+rpc:        files
+services:   files
+
+# Example - obey only what nisplus tells us...
+#services:  nisplus [NOTFOUND=return] files
+#networks:  nisplus [NOTFOUND=return] files
+#protocols: nisplus [NOTFOUND=return] files
+#rpc:       nisplus [NOTFOUND=return] files
+#ethers:    nisplus [NOTFOUND=return] files
+#netmasks:  nisplus [NOTFOUND=return] files
+#bootparams: nisplus [NOTFOUND=return] files
+#netgroup:   nisplus
+#publickey:  nisplus
+
+automount:  files
+aliases:    files
+NAME="ALT Server"
+VERSION="11.0"
+ID=altlinux
+VERSION_ID=11.0
+PRETTY_NAME="ALT Server 11.0 (Mendelevium)"
+ANSI_COLOR="1;33"
+CPE_NAME="cpe:/o:alt:server:11.0"
+BUILD_ID="ALT Server 11.0"
+ALT_BRANCH_ID="p11"
+HOME_URL="https://basealt.ru/"
+BUG_REPORT_URL="https://bugs.altlinux.org/"
+DOCUMENTATION_URL="https://docs.altlinux.org/"
+SUPPORT_URL="https://support.basealt.ru/"
+VARIANT_ID=edition_server
+VARIANT="ALT Server"
+LOGO=alt-server-logo
+root:x:0:0:System Administrator:/root:/bin/bash
+bin:x:1:1:bin:/:/dev/null
+daemon:x:2:2:daemon:/:/dev/null
+adm:x:3:4:adm:/var/adm:/dev/null
+lp:x:4:7:lp:/var/spool/lpd:/dev/null
+mail:x:8:12:mail:/var/spool/mail:/dev/null
+news:x:9:13:news:/var/spool/news:/dev/null
+uucp:x:10:14:uucp:/var/spool/uucp:/dev/null
+games:x:12:100:games:/usr/games:/dev/null
+ftp:x:14:50:FTP User:/var/ftp:/dev/null
+squid:x:23:23:Squid User:/var/spool/squid:/dev/null
+named:x:25:25:Bind User:/var/lib/named:/dev/null
+nscd:x:28:28:NSCD Daemon:/:/dev/null
+rpcuser:x:29:29:RPC Service User:/var/lib/nfs:/dev/null
+rpc:x:32:32:Portmapper RPC user:/:/dev/null
+mailman:x:41:41:GNU Mailing List Manager:/usr/share/mailman:/dev/null
+postfix:x:42:42:Postfix Mail Transport Agent:/var/spool/postfix:/dev/null
+popa3d:x:43:43:POP3 daemon:/dev/null:/dev/null
+xfs:x:44:44:X Font Server:/etc/X11/fs:/dev/null
+mysql:x:45:45:MySQL server:/var/lib/mysql:/dev/null
+postgres:x:46:46:PostgreSQL Server:/var/lib/pgsql:/dev/null
+gdm:x:47:47:GDM:/var/lib/gdm:/dev/null
+ldap:x:55:55:LDAP User:/var/lib/ldap:/dev/null
+exim:x:79:79:Exim Mail Transport Agent:/var/spool/exim:/dev/null
+apache:x:96:96:Apache web server:/var/www:/dev/null
+_nobody99:x:99:99:Nobody:/dev/null:/dev/null
+nobody:x:65534:65534:Linux Kernel overflowuid:/dev/null:/dev/null
+osec:x:999:999::/dev/null:/dev/null
+_autoipd:x:998:994:Avahi autoipd service:/var/lib/autoipd:/dev/null
+messagebus:x:997:993:D-Bus System User:/run/dbus:/dev/null
+polkitd:x:996:992:User for polkitd:/:/dev/null
+systemd-oom:x:995:983:systemd Userspace OOM Killer:/var/empty:/dev/null
+nfsuser:x:994:982:NFS Service User:/dev/null:/dev/null
+sshd:x:993:981::/var/empty:/dev/null
+_xfsscrub:x:992:979:Special User for the XFS Scrub service:/:/bin/false
+postman:x:991:48:postman:/dev/null:/dev/null
+_nslcd:x:990:976:NSS-LDAP Daemon:/:/sbin/nologin
+systemd-network:x:989:975:systemd Network Management:/var/empty:/dev/null
+systemd-resolve:x:988:974:systemd Resolver:/var/empty:/dev/null
+ntpd:x:987:972::/dev/null:/dev/null
+tcpdump:x:986:971::/dev/null:/dev/null
+_chrony:x:985:970:Chrony User:/var/lib/chrony:/dev/null
+iputils:x:984:968::/dev/null:/dev/null
+_iftop:x:983:967::/dev/null:/dev/null
+_dhcpcd:x:982:965:dhcpcd user:/var/lib/dhcpcd:/dev/null
+user:x:1000:1000::/home/user:/bin/bash
+_haproxy:x:981:964:HA Proxy:/var/lib/haproxy:/dev/null
+_nginx:x:980:963::/dev/null:/dev/null
+root:x:0:0:System Administrator:/root:/bin/bash
+bin:x:1:1:bin:/:/dev/null
+daemon:x:2:2:daemon:/:/dev/null
+adm:x:3:4:adm:/var/adm:/dev/null
+lp:x:4:7:lp:/var/spool/lpd:/dev/null
+mail:x:8:12:mail:/var/spool/mail:/dev/null
+news:x:9:13:news:/var/spool/news:/dev/null
+uucp:x:10:14:uucp:/var/spool/uucp:/dev/null
+games:x:12:100:games:/usr/games:/dev/null
+ftp:x:14:50:FTP User:/var/ftp:/dev/null
+squid:x:23:23:Squid User:/var/spool/squid:/dev/null
+named:x:25:25:Bind User:/var/lib/named:/dev/null
+nscd:x:28:28:NSCD Daemon:/:/dev/null
+rpcuser:x:29:29:RPC Service User:/var/lib/nfs:/dev/null
+rpc:x:32:32:Portmapper RPC user:/:/dev/null
+mailman:x:41:41:GNU Mailing List Manager:/usr/share/mailman:/dev/null
+postfix:x:42:42:Postfix Mail Transport Agent:/var/spool/postfix:/dev/null
+popa3d:x:43:43:POP3 daemon:/dev/null:/dev/null
+xfs:x:44:44:X Font Server:/etc/X11/fs:/dev/null
+mysql:x:45:45:MySQL server:/var/lib/mysql:/dev/null
+postgres:x:46:46:PostgreSQL Server:/var/lib/pgsql:/dev/null
+gdm:x:47:47:GDM:/var/lib/gdm:/dev/null
+ldap:x:55:55:LDAP User:/var/lib/ldap:/dev/null
+exim:x:79:79:Exim Mail Transport Agent:/var/spool/exim:/dev/null
+apache:x:96:96:Apache web server:/var/www:/dev/null
+_nobody99:x:99:99:Nobody:/dev/null:/dev/null
+nobody:x:65534:65534:Linux Kernel overflowuid:/dev/null:/dev/null
+osec:x:999:999::/dev/null:/dev/null
+_autoipd:x:998:994:Avahi autoipd service:/var/lib/autoipd:/dev/null
+messagebus:x:997:993:D-Bus System User:/run/dbus:/dev/null
+polkitd:x:996:992:User for polkitd:/:/dev/null
+systemd-oom:x:995:983:systemd Userspace OOM Killer:/var/empty:/dev/null
+nfsuser:x:994:982:NFS Service User:/dev/null:/dev/null
+sshd:x:993:981::/var/empty:/dev/null
+_xfsscrub:x:992:979:Special User for the XFS Scrub service:/:/bin/false
+postman:x:991:48:postman:/dev/null:/dev/null
+_nslcd:x:990:976:NSS-LDAP Daemon:/:/sbin/nologin
+systemd-network:x:989:975:systemd Network Management:/var/empty:/dev/null
+systemd-resolve:x:988:974:systemd Resolver:/var/empty:/dev/null
+ntpd:x:987:972::/dev/null:/dev/null
+tcpdump:x:986:971::/dev/null:/dev/null
+_chrony:x:985:970:Chrony User:/var/lib/chrony:/dev/null
+iputils:x:984:968::/dev/null:/dev/null
+_iftop:x:983:967::/dev/null:/dev/null
+_dhcpcd:x:982:965:dhcpcd user:/var/lib/dhcpcd:/dev/null
+user:x:1000:1000::/home/user:/bin/bash
+_haproxy:x:981:964:HA Proxy:/var/lib/haproxy:/dev/null
+min=disabled,24,11,8,7
+max=72
+passphrase=3
+match=4
+similar=deny
+random=47
+enforce=users
+retry=3
+# The below are just examples, by default none of these are used
+#wordlist=/usr/share/john/password.lst
+#denylist=/etc/passwdqc.deny
+#filter=/opt/passwdqc/hibp.pwq
+# Here are some colour setting.
+# Whitespace between the entries is optional.
+# Format:
+# Color_ID         = Foreground   ,  Background   ,forelight,  backblink(light)
+#
+COL_NORMAL         = COLOR_DEFAULT,  COLOR_DEFAULT,  NO_BOLD,  NO_BLINK
+COL_MENUSELECTED   = COLOR_RED    ,  COLOR_DEFAULT,  BOLD   ,  NO_BLINK
+COL_MENU           = COLOR_BLUE   ,  COLOR_DEFAULT,  BOLD   ,  NO_BLINK
+COL_NOTESELECTED   = COLOR_RED    ,  COLOR_DEFAULT,  BOLD   ,  NO_BLINK
+COL_NOTE           = COLOR_GREEN  ,  COLOR_DEFAULT,  BOLD   ,  NO_BLINK
+COL_TOPLINE        = COLOR_YELLOW ,  COLOR_BLUE   ,  BOLD   ,  NO_BLINK
+COL_BOTTOMLINE     = COLOR_YELLOW ,  COLOR_BLUE   ,  BOLD   ,  NO_BLINK
+COL_MANUALBOLD     = COLOR_DEFAULT,  COLOR_DEFAULT,  BOLD   ,  NO_BLINK
+COL_MANUALITALIC   = COLOR_DEFAULT,  COLOR_DEFAULT,  BOLD   ,  NO_BLINK
+COL_URL            = COLOR_MAGENTA,  COLOR_DEFAULT,  BOLD   ,  NO_BLINK
+COL_URLSELECTED    = COLOR_RED    ,  COLOR_DEFAULT,  BOLD   ,  NO_BLINK
+COL_INFOHIGHLIGHT  = COLOR_DEFAULT,  COLOR_DEFAULT,  BOLD   ,  NO_BLINK
+COL_SEARCHHIGHLIGHT= COLOR_DEFAULT,  COLOR_DEFAULT,  BOLD   ,  NO_BLINK
+#
+# Here are some keybindings as well...
+#
+KEY_TOTALSEARCH_1 = 's'
+KEY_TOTALSEARCH_2 = 'S'
+KEY_SEARCH_1 = '/'
+KEY_SEARCH_2 = '.'
+KEY_GOTO_1='g'
+KEY_GOTO_2='m'
+KEY_HOME_1=KEY_HOME
+KEY_HOME_2='H'
+KEY_PREVNODE_1='p'
+KEY_PREVNODE_2='P'
+KEY_NEXTNODE_1='n'
+KEY_NEXTNODE_2='N'
+KEY_UP_1=KEY_UP
+KEY_UP_2='k'
+KEY_TWOUP_1=KEY_IC
+KEY_TWOUP_2=0
+KEY_END_1=KEY_END
+KEY_END_2='e'
+KEY_PGDN_1=KEY_NPAGE
+KEY_PGDN_2=' '
+KEY_PGDN_AUTO_1=0
+KEY_PGDN_AUTO_2=' '
+KEY_PGUP_1=KEY_PPAGE
+KEY_PGUP_2='b'
+KEY_PGUP_AUTO_1=0
+KEY_PGUP_AUTO_2='b'
+KEY_DOWN_1=KEY_DOWN
+KEY_DOWN_2='j'
+KEY_TWODOWN_1=KEY_DC
+KEY_TWODOWN_2=0
+KEY_TOP_1='t'
+KEY_TOP_2='T'
+KEY_BACK_1=KEY_LEFT
+KEY_BACK_2='h'
+KEY_FOLLOWLINK_1=KEY_RIGHT
+KEY_FOLLOWLINK_2='\n'
+KEY_REFRESH_1=KEY_CTRL('l')
+KEY_REFRESH_2='~'
+KEY_SHELLFEED_1='!'
+KEY_SHELLFEED_2='1'
+KEY_QUIT_1='q'
+KEY_QUIT_2='Q'
+KEY_DIRPAGE_1='d'
+KEY_DIRPAGE_2='D'
+KEY_GOLINE_1='l'
+KEY_GOLINE_2=0
+KEY_PRINT_1=']'
+KEY_PRINT_2=0
+KEY_SEARCH_AGAIN_1='f'
+KEY_SEARCH_AGAIN_2=0
+#
+# Some options, explained in the man page
+#
+MANUAL=false
+CUT-MAN-HEADERS=true
+CUT-EMPTY-MAN-LINES=true
+RAW-FILENAME=false
+APROPOS=false
+DONT-HANDLE-WITHOUT-TAG-TABLE=false
+LONG-MANUAL-LINKS=false
+FILTER-0xB7=true
+QUIT-CONFIRMATION=false
+QUIT-CONFIRM-DEFAULT=no
+CLEAR-SCREEN-AT-EXIT=true
+CALL-READLINE-HISTORY=true
+STDERR-REDIRECTION="2> /dev/null"
+HTTPVIEWER=lynx
+FTPVIEWER=lynx
+MAILEDITOR=clear; mail
+PRINTUTILITY=lpr
+MANLINKS=1:8:2:3:4:5:6:7:9:n:p:o:3X11:3Xt:3x:3X
+SAFE-USER=nobody
+SAFE-GROUP=nogroup
+#
+# Remember, HIGHLIGHTREGEXP may be slow (thus it's commented by default)
+#
+#HIGHLIGHTREGEXP=Bash rulez
+#
+# The bellow instructions are quoted, since although they give
+# more security, they are quite slow when turned on...
+#
+#IGNORE-MACROS=pso:sy:write:open:opena:pi:!:als
+#QUOTE-IGNORED-MACROS=true
+# /etc/printcap
+#
+# Please don't edit this file directly unless you know what you are doing!
+# Be warned that the control-panel printtool requires a very strict format!
+# Look at the printcap(5) man page for more info.
+#
+# This file can be edited with the printtool in the control-panel.
+
+# System profile for basic ALT Linux system.
+#
+# It is recommended that this file be left unchanged to ease upgrades,
+# and any local additions go into /etc/profile.d/ directory.
+
+# See also /etc/security/limits.conf
+ulimit -Sc 0 >/dev/null 2>&1
+
+umask 022
+
+for f in /etc/default-environment; do
+	if [ -f "$f" -a -r "$f" -a -s "$f" ]; then
+		. "$f"
+	fi
+done
+
+[ -n "$PATH" ] || PATH="/usr/bin:/bin:/usr/local/bin"
+[ "$PATH" = "$HOME/bin" -o -z "${PATH##$HOME/bin:*}" -o \
+  -z "${PATH%%*:$HOME/bin}" -o -z "${PATH##*:$HOME/bin:*}" ] ||
+	PATH="$HOME/bin:$PATH"
+[ "$PATH" = "/usr/games" -o -z "${PATH##/usr/games:*}" -o \
+  -z "${PATH%%*:/usr/games}" -o -z "${PATH##*:/usr/games:*}" ] ||
+	PATH="$PATH:/usr/games"
+export PATH
+
+[ -n "$USER" ] || USER="`/usr/bin/id -un`"
+[ -n "$LOGNAME" ] || LOGNAME="$USER"
+[ -n "$MAIL" ] || MAIL="/var/mail/$LOGNAME"
+export USER LOGNAME MAIL
+
+HOSTNAME="$(/usr/bin/hostname)"
+HISTSIZE=999
+HISTFILESIZE=9999
+export HOSTNAME HISTSIZE HISTFILESIZE
+
+for f in /etc/profile.d/*.sh; do
+	if [ -f "$f" -a -r "$f" -a -x "$f" -a -s "$f" -a ! -L "$f" ]; then
+		. "$f"
+	fi
+done
+
+unset f
+# /etc/protocols:
+#
+# Internet (IP) protocols
+#
+#	from: @(#)protocols	5.1 (Berkeley) 4/17/89
+#
+# Updated for NetBSD based on RFC 1340, Assigned Numbers (July 1992).
+#
+# See also http://www.iana.org/assignments/protocol-numbers
+
+ip	0	IP		# internet protocol, pseudo protocol number
+hopopt	0	HOPOPT		# hop-by-hop options for ipv6
+icmp	1	ICMP		# internet control message protocol
+igmp	2	IGMP		# internet group management protocol
+ggp	3	GGP		# gateway-gateway protocol
+ipv4	4	IPv4		# IPv4 encapsulation
+st	5	ST		# ST datagram mode
+tcp	6	TCP		# transmission control protocol
+cbt	7	CBT		# CBT, Tony Ballardie <A.Ballardie@cs.ucl.ac.uk>
+egp	8	EGP		# exterior gateway protocol
+igp	9	IGP		# any private interior gateway (Cisco: for IGRP)
+bbn-rcc	10	BBN-RCC-MON	# BBN RCC Monitoring
+nvp	11	NVP-II		# Network Voice Protocol
+pup	12	PUP		# PARC universal packet protocol
+argus	13	ARGUS		# ARGUS (deprecated)
+emcon	14	EMCON		# EMCON
+xnet	15	XNET		# Cross Net Debugger
+chaos	16	CHAOS		# Chaos
+udp	17	UDP		# user datagram protocol
+mux	18	MUX		# Multiplexing protocol
+dcn	19	DCN-MEAS	# DCN Measurement Subsystems
+hmp	20	HMP		# host monitoring protocol
+prm	21	PRM		# packet radio measurement protocol
+xns-idp	22	XNS-IDP		# Xerox NS IDP
+trunk-1	23	TRUNK-1		# Trunk-1
+trunk-2	24	TRUNK-2		# Trunk-2
+leaf-1	25	LEAF-1		# Leaf-1
+leaf-2	26	LEAF-2		# Leaf-2
+rdp	27	RDP		# "reliable datagram" protocol
+irtp	28	IRTP		# Internet Reliable Transaction Protocol
+iso-tp4	29	ISO-TP4		# ISO Transport Protocol Class 4
+netblt	30	NETBLT		# Bulk Data Transfer Protocol
+mfe-nsp	31	MFE-NSP		# MFE Network Services Protocol
+merit-inp	32	MERIT-INP	# MERIT Internodal Protocol
+dccp	33	DCCP		# Datagram Congestion Control Protocol
+3pc	34	3PC		# Third Party Connect Protocol
+idpr	35	IDPR		# Inter-Domain Policy Routing Protocol
+xtp	36	XTP		# Xpress Tranfer Protocol
+ddp	37	DDP		# Datagram Delivery Protocol
+idpr-cmtp	38	IDPR-CMTP	# IDPR Control Message Transport Proto
+tp++	39	TP++		# TP++ Transport Protocol
+il	40	IL		# IL Transport Protocol
+ipv6	41	IPv6		# IPv6 encapsulation
+sdrp	42	SDRP		# Source Demand Routing Protocol
+ipv6-route	43	IPv6-Route	# Routing Header for IPv6
+ipv6-frag	44	IPv6-Frag	# Fragment Header for IPv6
+idrp	45	IDRP		# Inter-Domain Routing Protocol
+rsvp	46	RSVP		# Resource ReSerVation Protocol
+gre	47	GRE		# Generic Routing Encapsulation
+dsr	48	DSR		# Dynamic Source Routing Protocol
+bna	49	BNA		# BNA
+esp	50	ESP		# Encap Security Payload
+ah	51	AH		# Authentication Header
+i-nlsp	52	I-NLSP		# Integrated Net Layer Security TUBA
+swipe	53	SWIPE		# IP with Encryption
+narp	54	NARP		# NBMA Address Resolution Protocol
+mobile	55	MOBILE		# IP Mobility
+tlsp	56	TLSP		# Transport Layer Security Protocol
+skip	57	SKIP		# SKIP
+ipv6-icmp	58	IPv6-ICMP	# ICMP for IPv6
+ipv6-nonxt	59	IPv6-NoNxt	# No Next Header for IPv6
+ipv6-opts	60	IPv6-Opts	# Destination Options for IPv6
+#	61			# any host internal protocol
+cftp	62	CFTP		# CFTP
+#	63			# any local network
+sat-expak	64	SAT-EXPAK	# SATNET and Backroom EXPAK
+kryptolan	65	KRYPTOLAN	# Kryptolan
+rvd	66	RVD		# MIT Remote Virtual Disk Protocol
+ippc	67	IPPC		# Internet Pluribus Packet Core
+#	68			# any distributed file system
+sat-mon	69	SAT-MON		# SATNET Monitoring
+visa	70	VISA		# VISA Protocol
+ipcv	71	IPCV		# Internet Packet Core Utility
+cpnx	72	CPNX		# Computer Protocol Network Executive
+cphb	73	CPHB		# Computer Protocol Heart Beat
+wsn	74	WSN		# Wang Span Network
+pvp	75	PVP		# Packet Video Protocol
+br-sat-mon	76	BR-SAT-MON	# Backroom SATNET Monitoring
+sun-nd	77	SUN-ND		# SUN ND PROTOCOL-Temporary
+wb-mon	78	WB-MON		# WIDEBAND Monitoring
+wb-expak	79	WB-EXPAK	# WIDEBAND EXPAK
+iso-ip	80	ISO-IP		# ISO Internet Protocol
+vmtp	81	VMTP		# Versatile Message Transport
+secure-vmtp	82	SECURE-VMTP	# SECURE-VMTP
+vines	83	VINES		# VINES
+ttp	84	TTP		# TTP
+nsfnet-igp	85	NSFNET-IGP	# NSFNET-IGP
+dgp	86	DGP		# Dissimilar Gateway Protocol
+tcf	87	TCF		# TCF
+eigrp	88	EIGRP		# Enhanced Interior Routing Protocol (Cisco)
+ospf	89	OSPFIGP		# Open Shortest Path First IGP
+sprite-rpc	90	Sprite-RPC	# Sprite RPC Protocol
+larp	91	LARP		# Locus Address Resolution Protocol
+mtp	92	MTP		# Multicast Transport Protocol
+ax.25	93	AX.25		# AX.25 Frames
+ipip	94	IPIP		# Yet Another IP encapsulation
+micp	95	MICP		# Mobile Internetworking Control Pro.
+scc-sp	96	SCC-SP		# Semaphore Communications Sec. Pro.
+etherip	97	ETHERIP		# Ethernet-within-IP Encapsulation
+encap	98	ENCAP		# Yet Another IP encapsulation
+#	99			# any private encryption scheme
+gmtp	100	GMTP		# GMTP
+ifmp	101	IFMP		# Ipsilon Flow Management Protocol
+pnni	102	PNNI		# PNNI over IP
+pim	103	PIM		# Protocol Independent Multicast
+aris	104	ARIS		# ARIS
+scps	105	SCPS		# SCPS
+qnx	106	QNX		# QNX
+a/n	107	A/N		# Active Networks
+ipcomp	108	IPComp		# IP Payload Compression Protocol
+snp	109	SNP		# Sitara Networks Protocol
+compaq-peer	110	Compaq-Peer	# Compaq Peer Protocol
+ipx-in-ip	111	IPX-in-IP	# IPX in IP
+vrrp	112	VRRP		# Virtual Router Redundancy Protocol
+pgm	113	PGM		# PGM Reliable Transport Protocol
+#	114			# any 0-hop protocol
+l2tp	115	L2TP		# Layer Two Tunneling Protocol
+ddx	116	DDX		# D-II Data Exchange
+iatp	117	IATP		# Interactive Agent Transfer Protocol
+stp	118	STP		# Schedule Transfer
+srp	119	SRP		# SpectraLink Radio Protocol
+uti	120	UTI		# UTI
+smp	121	SMP		# Simple Message Protocol
+sm	122	SM		# SM (deprecated)
+ptp	123	PTP		# Performance Transparency Protocol
+isis	124	ISIS		# ISIS over IPv4
+fire	125	FIRE
+crtp	126	CRTP		# Combat Radio Transport Protocol
+crudp	127	CRUDP		# Combat Radio User Datagram
+sscopmce	128	SSCOPMCE
+iplt	129	IPLT
+sps	130	SPS		# Secure Packet Shield
+pipe	131	PIPE		# Private IP Encapsulation within IP
+sctp	132	SCTP		# Stream Control Transmission Protocol
+fc	133	FC		# Fibre Channel
+rsvp-e2e-ignore	134	RSVP-E2E-IGNORE	# Aggregation of RSVP for IPv4 and IPv6 Reservations
+mobility-header	135	Mobility-Header	# Mobility Header
+udplite	136	UDPLite		# The UDP-Lite Protocol
+mpls-in-ip	137	MPLS-in-IP	# Encapsulating MPLS in IP or Generic Routing Encapsulation (GRE)
+manet	138	manet		# MANET Protocols
+hip	139	HIP		# Host Identity Protocol
+shim6	140	Shim6		# Shim6 Protocol
+wesp	141	WESP		# Wrapped Encapsulating Security Payload
+rohc	142	ROHC		# Robust Header Compression
+ethernet	143	Ethernet	# Ethernet encapsulation for SRv6
+aggfrag	144	AGGFRAG		# AGGFRAG encapsulation payload for ESP
+#   145-252 Unassigned                                       [IANA]
+#   253     Use for experimentation and testing           [RFC3692]
+#   254     Use for experimentation and testing           [RFC3692]
+#   255                 Reserved                             [IANA]
+#
+# The following entries have not been assigned by IANA but are used
+# internally by the Linux kernel.
+mptcp	262	MPTCP		# Multipath TCP connection
+ALT Server 11.0 (Mendelevium)
+###############################################################################
+#
+# Copyright (C) 2005 Red Hat, Inc. All Rights Reserved.
+# Written by David Howells (dhowells@redhat.com)
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version
+# 2 of the License, or (at your option) any later version.
+#
+###############################################################################
+
+
+###############################################################################
+#
+# We can run programs or scripts
+# - Macro substitutions in arguments:
+#	%%...	%...
+#	%o	operation name
+#	%k	ID of key being operated upon
+#	%t	type of key being operated upon
+#	%d	description of key being operated upon
+#	%c	callout info
+#	%u	UID of requestor
+#	%g	GID of requestor
+#	%T	thread keyring of requestor (may be 0)
+#	%P	process keyring of requestor (may be 0)
+#	%S	session keyring of requestor (may be the user's default session)
+#
+################################################################################
+
+#OP	TYPE	DESCRIPTION	CALLOUT INFO	PROGRAM ARG1 ARG2 ARG3 ...
+#======	=======	===============	===============	===============================
+create  dns_resolver *		*               /sbin/key.dns_resolver %k
+create	user	debug:*		negate		/bin/keyctl negate %k 30 %S
+create  user    debug:*         rejected        /bin/keyctl reject %k 30 %c %S
+create  user    debug:*         expired         /bin/keyctl reject %k 30 %c %S
+create  user    debug:*         revoked         /bin/keyctl reject %k 30 %c %S
+create	user	debug:loop:*	*		|/bin/cat
+create	user	debug:*		*		/usr/share/keyutils/request-key-debug.sh %k %d %c %S
+create	id_resolver	*	*		/sbin/nfsidmap -t 600 %k %d
+negate	*	*		*		/bin/keyctl negate %k 30 %S
+# Generated by resolvconf
+# Do not edit manually, use
+# /etc/net/ifaces/<interface>/resolv.conf instead.
+domain localdomain
+nameserver 192.168.133.2
+# Configuration for resolvconf(8)
+# See resolvconf.conf(5) for details
+
+resolv_conf_head='# Do not edit manually, use\n# /etc/net/ifaces/<interface>/resolv.conf instead.'
+resolv_conf=/etc/resolv.conf
+
+# These interfaces will always be processed first.
+interface_order='lo lo[0-9]* lo.*'
+
+# These interfaces will be processed next, unless they have a metric.
+dynamic_order='tap[0-9]* tun[0-9]* vpn vpn[0-9]* wg[0-9]* ppp[0-9]* ippp[0-9]*'
+
+#Configuration files for named subscriber.
+named_zones=/var/lib/bind/etc/resolvconf-zones.conf
+named_options=/var/lib/bind/etc/resolvconf-options.conf
+
+#Configuration files for dnsmasq subscriber.
+dnsmasq_conf=/etc/dnsmasq.conf.d/60-resolvconf
+dnsmasq_resolv=/etc/resolv.conf.dnsmasq
+options {
+	default-server	localhost;
+	default-port	953;
+	default-key	"rndc-key";
+};
+
+server localhost {
+	key	"rndc-key";
+};
+
+include "/var/lib/bind/etc/rndc.key";
+users:vmusers
+#ident	"@(#)rpc	1.11	95/07/14 SMI"	/* SVr4.0 1.2	*/
+#
+#	rpc
+#
+portmapper	100000	portmap sunrpc rpcbind
+rstatd		100001	rstat rup perfmeter rstat_svc
+rusersd		100002	rusers
+nfs		100003	nfsprog
+ypserv		100004	ypprog
+mountd		100005	mount showmount
+ypbind		100007
+walld		100008	rwall shutdown
+yppasswdd	100009	yppasswd
+etherstatd	100010	etherstat
+rquotad		100011	rquotaprog quota rquota
+sprayd		100012	spray
+3270_mapper	100013
+rje_mapper	100014
+selection_svc	100015	selnsvc
+database_svc	100016
+rexd		100017	rex
+alis		100018
+sched		100019
+llockmgr	100020
+nlockmgr	100021
+x25.inr		100022
+statmon		100023
+status		100024
+bootparam	100026
+ypupdated	100028	ypupdate
+keyserv		100029	keyserver
+sunlink_mapper	100033
+tfsd		100037
+nsed		100038
+nsemntd		100039
+showfhd		100043	showfh
+ioadmd		100055	rpc.ioadmd
+NETlicense	100062
+sunisamd	100065
+debug_svc 	100066  dbsrv
+ypxfrd		100069  rpc.ypxfrd
+bugtraqd	100071
+kerbd		100078
+event		100101	na.event	# SunNet Manager
+logger		100102	na.logger	# SunNet Manager
+sync		100104	na.sync
+hostperf	100107	na.hostperf
+activity	100109	na.activity	# SunNet Manager
+hostmem		100112	na.hostmem
+sample		100113	na.sample
+x25		100114	na.x25
+ping		100115	na.ping
+rpcnfs		100116	na.rpcnfs
+hostif		100117	na.hostif
+etherif		100118	na.etherif
+iproutes	100120	na.iproutes
+layers		100121	na.layers
+snmp		100122	na.snmp snmp-cmc snmp-synoptics snmp-unisys snmp-utk
+traffic		100123	na.traffic
+nfs_acl		100227
+sadmind		100232
+nisd		100300	rpc.nisd
+nispasswd	100303	rpc.nispasswdd
+ufsd		100233	ufsd
+fedfs_admin	100418
+pcnfsd		150001	pcnfs
+amd		300019  amq
+sgi_fam		391002	fam
+bwnfsd		545580417
+fypxfrd		600100069 freebsd-ypxfrd
+#
+# ALT Linux configuration file for GNU screen(1) terminal settings.
+# This file is sourced from /etc/screenrc.
+#
+
+# all termcap entries are now duplicated as terminfo entries.
+# only difference should be the slightly modified syntax, and check for
+# terminfo entries, that are already corected in the database.
+#
+# G0 	we have a SEMI-GRAPHICS-CHARACTER-MODE
+# WS	this sequence resizes our window.
+# cs    this sequence changes the scrollregion
+# hs@	we have no hardware statusline. screen will only believe that
+#       there is a hardware status line if hs,ts,fs,ds are all set.
+# ts    to statusline
+# fs    from statusline
+# ds    delete statusline
+# al    add one line
+# AL    add multiple lines
+# dl    delete one line
+# DL    delete multiple lines
+# ic    insert one char (space)
+# IC    insert multiple chars
+# nx    terminal uses xon/xoff
+
+termcap  facit|vt100|xterm LP:G0
+terminfo facit|vt100|xterm LP:G0
+
+#the vt100 description does not mention "dl". *sigh*
+termcap  vt100 dl=5\E[M
+terminfo vt100 dl=5\E[M
+
+#facit's "al" / "dl"  are buggy if the current / last line
+#contain attributes...
+termcap  facit al=\E[L\E[K:AL@:dl@:DL@:cs=\E[%i%d;%dr:ic@
+terminfo facit al=\E[L\E[K:AL@:dl@:DL@:cs=\E[%i%p1%d;%p2%dr:ic@
+
+#make sun termcap/info better
+termcap  sun 'up=^K:AL=\E[%dL:DL=\E[%dM:UP=\E[%dA:DO=\E[%dB:LE=\E[%dD:RI=\E[%dC:IC=\E[%d@:WS=1000\E[8;%d;%dt'
+terminfo sun 'up=^K:AL=\E[%p1%dL:DL=\E[%p1%dM:UP=\E[%p1%dA:DO=\E[%p1%dB:LE=\E[%p1%dD:RI=\E[%p1%dC:IC=\E[%p1%d@:WS=\E[8;%p1%d;%p2%dt$<1000>'
+
+#xterm understands both im/ic and doesn't have a status line.
+#Note: Do not specify im and ic in the real termcap/info file as
+#some programs (e.g. vi) will (no,no, may (jw)) not work anymore.
+termcap  xterm|fptwist hs@:cs=\E[%i%d;%dr:im=\E[4h:ei=\E[4l
+terminfo xterm|fptwist hs@:cs=\E[%i%p1%d;%p2%dr:im=\E[4h:ei=\E[4l
+
+# Long time I had this in my private screenrc file. But many people
+# seem to want it (jw):
+# we do not want the width to change to 80 characters on startup:
+# on suns, /etc/termcap has :is=\E[r\E[m\E[2J\E[H\E[?7h\E[?1;3;4;6l:
+termcap xterm 'is=\E[r\E[m\E[2J\E[H\E[?7h\E[?1;4;6l'
+terminfo xterm 'is=\E[r\E[m\E[2J\E[H\E[?7h\E[?1;4;6l'
+
+# Do not use xterms alternate window buffer.
+# This one would not add lines to the scrollback buffer.
+#termcap xterm|xterms|xs ti=\E7\E[?47l
+#terminfo xterm|xterms|xs ti=\E7\E[?47l
+
+#make hp700 termcap/info better
+termcap  hp700 'Z0=\E[?3h:Z1=\E[?3l:hs:ts=\E[62"p\E[0$~\E[2$~\E[1$}:fs=\E[0}\E[61"p:ds=\E[62"p\E[1$~\E[61"p:ic@'
+terminfo hp700 'Z0=\E[?3h:Z1=\E[?3l:hs:ts=\E[62"p\E[0$~\E[2$~\E[1$}:fs=\E[0}\E[61"p:ds=\E[62"p\E[1$~\E[61"p:ic@'
+
+#wyse-75-42 must have defflow control (xo = "terminal uses xon/xoff")
+#(nowadays: nx = padding doesn't work, have to use xon/off)
+#essential to have it here, as this is a slow terminal.
+termcap wy75-42 nx:xo:Z0=\E[?3h\E[31h:Z1=\E[?3l\E[31h
+terminfo wy75-42 nx:xo:Z0=\E[?3h\E[31h:Z1=\E[?3l\E[31h
+
+# Debian screenrc:
+# To get screen to add lines to xterm's scrollback buffer, uncomment the
+# following termcapinfo line which tells xterm to use the normal screen buffer
+# (which has scrollback), not the alternate screen buffer.
+#
+#termcapinfo xterm|xterms|xs|rxvt ti@:te@
+#
+# ALT Linux configuration file for GNU screen(1).
+# See /usr/share/doc/screen-*/*screenrc sample files.
+# Place custom options into ~/.screenrc.
+#
+
+# load terminal settings
+source /etc/screencap
+
+# disable copyright notice during startup
+#startup_message off
+
+# enable visual bell (audible bell is used by default)
+vbell on
+
+# define a bigger scrollback, default is 100 lines
+defscrollback 999
+
+# remove some stupid/dangerous key bindings
+bind ^k
+#bind L
+bind ^\
+
+# make key bindings better
+bind \\ quit
+bind K kill
+bind I login on
+bind O login off
+bind } history
+#
+# scsi_id configuration
+#
+# lower or upper case has no effect on the left side. Quotes (") are
+# required for spaces in values. Model is the same as the SCSI
+# INQUIRY product identification field. Per the SCSI INQUIRY, the vendor
+# is limited to 8 bytes, model to 16 bytes.
+#
+# The first matching line found is used. Short matches match longer ones,
+# if you do not want such a match space fill the extra bytes. If no model
+# is specified, only the vendor string need match.
+#
+# options=<any scsi_id command line options>
+# vendor=string[,model=string],options=<per-device scsi_id options>
+
+# some libata drives require vpd page 0x80
+vendor="ATA",options=-p 0x80
+vc/1
+vc/2
+vc/3
+vc/4
+vc/5
+vc/6
+vc/7
+vc/8
+vc/9
+vc/10
+vc/11
+tty1
+tty2
+tty3
+tty4
+tty5
+tty6
+tty7
+tty8
+tty9
+tty10
+tty11
+xvc0
+# libsensors configuration file
+# -----------------------------
+#
+# This default configuration file only includes statements which do not
+# differ from one mainboard to the next. Only label, compute and set
+# statements for internal voltage and temperature sensors are included.
+#
+# In general, local changes should not be added to this file, but rather
+# placed in custom configuration files located in /etc/sensors.d. This
+# approach makes further updates much easier.
+#
+# Such custom configuration files for specific mainboards can be found in
+# "configs" directory of lm-sensors package.
+#
+# Please contribute back a configuration of your board so other users with
+# the same hardware won't need to recreate it again and again.
+
+chip "lm78-*" "lm79-*" "lm80-*" "lm96080-*"
+
+    label temp1 "M/B Temp"
+
+
+chip "w83792d-*"
+
+    label in0 "VcoreA"
+    label in1 "VcoreB"
+    label in6 "+5V"
+    label in7 "5VSB"
+    label in8 "Vbat"
+
+    set in6_min  5.0 * 0.90
+    set in6_max  5.0 * 1.10
+    set in7_min  5.0 * 0.90
+    set in7_max  5.0 * 1.10
+    set in8_min  3.0 * 0.90
+    set in8_max  3.0 * 1.10
+
+
+chip "w83793-*"
+
+    label in0 "VcoreA"
+    label in1 "VcoreB"
+    label in7 "+5V"
+    label in8 "5VSB"
+    label in9 "Vbat"
+
+    set in7_min  5.0 * 0.90
+    set in7_max  5.0 * 1.10
+    set in8_min  5.0 * 0.90
+    set in8_max  5.0 * 1.10
+    set in9_min  3.0 * 0.90
+    set in9_max  3.0 * 1.10
+
+
+chip "w83795g-*" "w83795adg-*"
+
+    label in12 "+3.3V"
+    label in13 "3VSB"
+    label in14 "Vbat"
+
+    set in12_min  3.3 * 0.90
+    set in12_max  3.3 * 1.10
+    set in13_min  3.3 * 0.90
+    set in13_max  3.3 * 1.10
+    set in14_min  3.0 * 0.90
+    set in14_max  3.3 * 1.10
+
+
+chip "via686a-*"
+
+    label in0 "Vcore"
+    label in2 "+3.3V"
+    label in3 "+5V"
+    label in4 "+12V"
+
+    set in2_min  3.3 * 0.90
+    set in2_max  3.3 * 1.10
+    set in3_min  5.0 * 0.90
+    set in3_max  5.0 * 1.10
+    set in4_min 12.0 * 0.90
+    set in4_max 12.0 * 1.10
+
+
+chip "adm1025-*" "ne1619-*"
+
+    label in1 "Vcore"
+    label in2 "+3.3V"
+    label in3 "+5V"
+    label in4 "+12V"
+    label in5 "VCC"
+
+    set in2_min  3.3 * 0.90
+    set in2_max  3.3 * 1.10
+    set in3_min  5.0 * 0.90
+    set in3_max  5.0 * 1.10
+    set in5_min  3.3 * 0.90
+    set in5_max  3.3 * 1.10
+# Depending on how your chip is hardwired, you may or may not have
+# +12V readings.
+#    set in4_min 12.0 * 0.90
+#    set in4_max 12.0 * 1.10
+
+    label temp1 "CPU Temp"
+    label temp2 "M/B Temp"
+
+
+chip "lm87-*" "adm1024-*"
+
+    label in1 "Vcore"
+    label in2 "+3.3V"
+    label in3 "+5V"
+    label in4 "+12V"
+
+    set in2_min  3.3 * 0.90
+    set in2_max  3.3 * 1.10
+    set in3_min  5.0 * 0.90
+    set in3_max  5.0 * 1.10
+    set in4_min 12.0 * 0.90
+    set in4_max 12.0 * 1.10
+
+    label temp1 "M/B Temp"
+    label temp2 "CPU Temp"
+
+
+chip "it87-*" "it8712-*" "it8716-*" "it8718-*" "it8720-*"
+
+    label in8 "Vbat"
+
+
+chip "fscpos-*" "fscher-*"
+#FSC "Hermes"
+
+    label in0 "+12V"
+    label in1 "+5V"
+    label in2 "Vbat"
+
+    label temp1 "CPU Temp"
+    label temp2 "M/B Temp"
+    label temp3 "Aux Temp"
+
+
+chip "fscscy-*"
+#FSC "Scylla"
+
+    label in0 "+12V"
+    label in1 "+5V"
+    label in2 "+3.3V"
+
+    label temp1 "CPU0 Temp"
+    label temp2 "CPU1 Temp"
+    label temp3 "M/B Temp"
+    label temp4 "Aux Temp"
+
+
+chip "fschds-*"
+# Fujitsu Technology Solutions, "Hades"-Chip
+
+# Temperatures
+    label temp1 "CPU Temp"
+    label temp2 "Super I/O Temp"
+    label temp3 "System Temp"
+
+# Fans
+    label fan1 "PSU Fan"
+    label fan2 "CPU Fan"
+    label fan3 "System FAN2"
+    label fan4 "System FAN3"
+    label fan5 "System FAN4"
+
+# Voltages
+    label in0 "+12V"
+    label in1 "+5V"
+    label in2 "Vbat"
+
+chip "fscsyl-*"
+# Fujitsu Technology Solutions, "Syleus"-Chip
+
+# Temperatures
+    label temp1 "CPU Temp"
+    label temp4 "Super I/O Temp"
+    label temp5 "Northbridge Temp"
+
+# Fans
+    label fan1 "CPU Fan"
+    label fan2 "System FAN2"
+    label fan3 "System FAN3"
+    label fan4 "System FAN4"
+    label fan7 "PSU Fan"
+
+# Voltages
+    label in0 "+12V"
+    label in1 "+5V"
+    label in2 "Vbat"
+    label in3 "+3.3V"
+    label in5 "+3.3V-Aux"
+
+chip "vt1211-*"
+
+    label in5 "+3.3V"
+
+    label temp2 "SIO Temp"
+
+
+chip "vt8231-*"
+
+    label in5 "+3.3V"
+
+
+chip "smsc47m192-*"
+
+    label in1 "Vcore"
+    label in2 "+3.3V"
+    label in3 "+5V"
+    label in4 "+12V"
+    label in5 "VCC"
+
+    set in2_min  3.3 * 0.90
+    set in2_max  3.3 * 1.10
+    set in3_min  5.0 * 0.90
+    set in3_max  5.0 * 1.10
+    set in4_min 12.0 * 0.90
+    set in4_max 12.0 * 1.10
+    set in5_min  3.3 * 0.90
+    set in5_max  3.3 * 1.10
+
+    label temp1 "SIO Temp"
+
+
+chip "lm85-*" "lm85b-*" "lm85c-*" "adm1027-*" "adt7463-*" "adt7468-*" \
+     "emc6d100-*" "emc6d102-*" "emc6d103-*" "emc6d103s-*" 
+
+    label in1 "Vcore"
+    label in2 "+3.3V"
+    label in3 "+5V"
+    label in4 "+12V"
+
+    set in2_min  3.3 * 0.90
+    set in2_max  3.3 * 1.10
+    set in3_min  5.0 * 0.90
+    set in3_max  5.0 * 1.10
+# Depending on how your chip is hardwired, you may or may not have
+# +12V readings.
+#    set in4_min 12.0 * 0.90
+#    set in4_max 12.0 * 1.10
+
+    label temp2 "M/B Temp"
+
+
+chip "emc6w201-*"
+
+    label in2 "+3.3V"
+    label in3 "+5V"
+
+    label temp6 "M/B Temp"
+
+
+chip "pc87365-*" "pc87366-*"
+
+# Voltage inputs
+
+    label in7 "3VSB"
+    label in8 "VDD"
+    label in9 "Vbat"
+    label in10 "AVDD"
+
+    compute in7   @*2, @/2
+    compute in8   @*2, @/2
+    compute in10  @*2, @/2
+
+# These are the operating conditions as recommended by National
+# Semiconductor
+    set in7_min   3.0
+    set in7_max   3.6
+    set in8_min   3.0
+    set in8_max   3.6
+    set in10_min  3.0
+    set in10_max  3.6
+# Depending on the hardware setup, the battery voltage may or may not
+# be monitored.
+#    set in9_min   2.4
+#    set in9_max   3.6
+
+    label temp3 "SIO Temp"
+
+    set temp3_min    0
+    set temp3_max   70
+    set temp3_crit  85
+
+
+chip "adm1030-*" "adm1031-*"
+
+    label temp1 "M/B Temp"
+
+
+chip "w83627thf-*"
+
+    label in3 "+5V"
+    label in7 "5VSB"
+    label in8 "Vbat"
+
+    # Internal resistors
+    compute in3  @ * (1 + 34/51), @ / (1 + 34/51)
+    compute in7  @ * (1 + 34/51), @ / (1 + 34/51)
+
+    set in3_min  5.0 * 0.90
+    set in3_max  5.0 * 1.10
+    set in7_min  5.0 * 0.90
+    set in7_max  5.0 * 1.10
+# The battery voltage may or may not be monitored.
+#    set in8_min  3.0 * 0.90
+#    set in8_max  3.0 * 1.10
+
+
+chip "w83627ehf-*" "w83627dhg-*" "w83667hg-*" "nct6775-*" "nct6776-*" \
+     "nct6779-*" "nct6791-*" "nct6795-*" "nct6796-*"
+
+    label in0 "Vcore"
+    label in2 "AVCC"
+    label in3 "+3.3V"
+    label in7 "3VSB"
+    label in8 "Vbat"
+
+    set in2_min  3.3 * 0.90
+    set in2_max  3.3 * 1.10
+    set in3_min  3.3 * 0.90
+    set in3_max  3.3 * 1.10
+    set in7_min  3.3 * 0.90
+    set in7_max  3.3 * 1.10
+    set in8_min  3.0 * 0.90
+    set in8_max  3.3 * 1.10
+
+
+chip "w83627uhg-*"
+
+    label in2 "AVCC"
+    label in3 "+5V"
+    label in7 "5VSB"
+    label in8 "Vbat"
+
+    set in2_min  5.0 * 0.90
+    set in2_max  5.0 * 1.10
+    set in3_min  5.0 * 0.90
+    set in3_max  5.0 * 1.10
+    set in7_min  5.0 * 0.90
+    set in7_max  5.0 * 1.10
+    set in8_min  3.0 * 0.90
+    set in8_max  3.3 * 1.10
+
+
+chip "f71805f-*"
+
+    label in0 "+3.3V"
+
+    set in0_min  3.3 * 0.90
+    set in0_max  3.3 * 1.10
+
+
+chip "f71872f-*"
+
+    label in0 "+3.3V"
+    label in9 "Vbat"
+    label in10 "3VSB"
+
+    set in0_min   3.3 * 0.90
+    set in0_max   3.3 * 1.10
+    set in9_min   3.0 * 0.90
+    set in9_max   3.0 * 1.10
+    set in10_min  3.3 * 0.90
+    set in10_max  3.3 * 1.10
+
+
+chip "k8temp-*"
+
+    label temp1 "Core0 Temp"
+    label temp2 "Core0 Temp"
+    label temp3 "Core1 Temp"
+    label temp4 "Core1 Temp"
+
+
+chip "dme1737-*"
+
+    label in0 "5VSB"
+    label in1 "Vcore"
+    label in2 "+3.3V"
+    label in3 "+5V"
+    label in4 "+12V"
+    label in5 "3VSB"
+    label in6 "Vbat"
+
+    label temp2 "SIO Temp"
+
+    set in0_min  5.0 * 0.90
+    set in0_max  5.0 * 1.10
+    set in2_min  3.3 * 0.90
+    set in2_max  3.3 * 1.10
+    set in3_min  5.0 * 0.90
+    set in3_max  5.0 * 1.10
+    set in4_min 12.0 * 0.90
+    set in4_max 12.0 * 1.10
+    set in5_min  3.3 * 0.90
+    set in5_max  3.3 * 1.10
+    set in6_min  3.0 * 0.90
+    set in6_max  3.0 * 1.10
+
+
+chip "sch311x-*"
+
+    label in1 "Vcore"
+    label in2 "+3.3V"
+    label in3 "+5V"
+    label in4 "+12V"
+    label in5 "3VSB"
+    label in6 "Vbat"
+
+    label temp2 "SIO Temp"
+
+    set in2_min  3.3 * 0.90
+    set in2_max  3.3 * 1.10
+    set in3_min  5.0 * 0.90
+    set in3_max  5.0 * 1.10
+    set in4_min 12.0 * 0.90
+    set in4_max 12.0 * 1.10
+    set in5_min  3.3 * 0.90
+    set in5_max  3.3 * 1.10
+    set in6_min  3.0 * 0.90
+    set in6_max  3.0 * 1.10
+
+
+chip "sch5027-*"
+
+    label in0 "5VSB"
+    label in1 "Vcore"
+    label in2 "+3.3V"
+    label in5 "3VSB"
+    label in6 "Vbat"
+
+    label temp2 "SIO Temp"
+
+    set in0_min  5.0 * 0.90
+    set in0_max  5.0 * 1.10
+    set in2_min  3.3 * 0.90
+    set in2_max  3.3 * 1.10
+    set in5_min  3.3 * 0.90
+    set in5_max  3.3 * 1.10
+    set in6_min  3.0 * 0.90
+    set in6_max  3.0 * 1.10
+
+
+chip "sch5127-*"
+
+    label in2 "+3.3V"
+    label in5 "3VSB"
+    label in6 "Vbat"
+
+    set in2_min  3.3 * 0.90
+    set in2_max  3.3 * 1.10
+    set in5_min  3.3 * 0.90
+    set in5_max  3.3 * 1.10
+    set in6_min  3.0 * 0.90
+    set in6_max  3.0 * 1.10
+
+
+chip "f71808e-*" "f71808a-*" "f71862fg-*" "f71869-*" "f71869a-*" "f71882fg-*" \
+     "f71889fg-*" "f71889ed-*" "f71889a-*"
+
+    label in0 "+3.3V"
+    label in7 "3VSB"
+    label in8 "Vbat"
+
+    compute in0  @*2, @/2
+    compute in7  @*2, @/2
+    compute in8  @*2, @/2
+
+
+chip "f71858fg-*" "f8000-*"
+
+    label in0 "+3.3V"
+    label in1 "3VSB"
+    label in2 "Vbat"
+
+    compute in0  @*2, @/2
+    compute in1  @*2, @/2
+    compute in2  @*2, @/2
+
+
+chip "f71868a-*"
+
+    label in0 "+3.3V"
+    label in7 "3VSB"
+    label in8 "Vbat"
+    label in9 "5VSB"
+
+    compute in0  @*2, @/2
+    compute in7  @*2, @/2
+    compute in8  @*2, @/2
+    compute in9  @*3, @/3
+
+
+chip "f81865f-*"
+
+    label in0 "+3.3V"
+    label in5 "3VSB"
+    label in6 "Vbat"
+
+    compute in0  @*2, @/2
+    compute in5  @*2, @/2
+    compute in6  @*2, @/2
+
+
+chip "adt7473-*" "adt7475-*"
+
+    label in2 "+3.3V"
+
+    set in2_min  3.3 * 0.90
+    set in2_max  3.3 * 1.10
+
+    label temp2 "Board Temp"
+
+
+chip "adt7476-*" "adt7490-*"
+
+    label in1 "Vcore"
+    label in2 "+3.3V"
+    label in3 "+5V"
+    label in4 "+12V"
+
+    set in2_min  3.3 * 0.90
+    set in2_max  3.3 * 1.10
+    set in3_min  5.0 * 0.90
+    set in3_max  5.0 * 1.10
+# Depending on how your ADT7476 is hardwired, you may or may not have
+# +12V readings.
+#    set in4_min 12.0 * 0.90
+#    set in4_max 12.0 * 1.10
+
+    label temp2 "M/B Temp"
+# /etc/services:
+#
+# Network services, Internet style
+#
+# The latest IANA port assignments can be gotten from
+#	http://www.iana.org/assignments/port-numbers
+#
+# The port numbers are divided into three ranges: the Well Known Ports,
+# the Registered Ports, and the Dynamic and/or Private Ports.
+#
+# The Well Known Ports are those from 0 through 1023.
+# The Registered Ports are those from 1024 through 49151.
+# The Dynamic and/or Private Ports are those from 49152 through 65535.
+#
+# Note that it is presently the policy of IANA to assign a single well-known
+# port number for both TCP and UDP; hence, most entries here have two entries
+# even if the protocol doesn't support UDP operations.
+#
+# Not all ports are included, only the more common ones.
+#
+# Each line describes one service, and is of the form:
+#
+# service-name  port/protocol  [aliases ...]   [# comment]
+
+tcpmux		1/tcp				# TCP port service multiplexer
+tcpmux		1/udp				# TCP port service multiplexer
+rje		5/tcp				# Remote Job Entry
+rje		5/udp				# Remote Job Entry
+echo		7/tcp				# Echo
+echo		7/udp				# Echo
+discard		9/tcp		sink null	# Discard
+discard		9/udp		sink null	# Discard
+systat		11/tcp		users		# Active Users
+systat		11/udp		users		# Active Users
+daytime		13/tcp				# Daytime (RFC 867)
+daytime		13/udp				# Daytime (RFC 867)
+qotd		17/tcp		quote		# Quote of the Day
+qotd		17/udp		quote		# Quote of the Day
+chargen		19/tcp		ttytst source	# Character Generator
+chargen		19/udp		ttytst source	# Character Generator
+ftp-data	20/tcp				# File Transfer [Default Data]
+ftp-data	20/udp				# File Transfer [Default Data]
+ftp		21/tcp		fsp fspd	# File Transfer [Control]
+ftp		21/udp		fsp fspd	# File Transfer [Control]
+ssh		22/tcp				# SSH Remote Login Protocol
+ssh		22/udp				# SSH Remote Login Protocol
+telnet		23/tcp				# Telnet
+telnet		23/udp				# Telnet
+lmtp		24/tcp				# LMTP
+lmtp		24/udp				# LMTP
+smtp		25/tcp		mail		# Simple Mail Transfer Protocol
+smtp		25/udp		mail		# Simple Mail Transfer Protocol
+time		37/tcp		timserver	# Time
+time		37/udp		timserver	# Time
+rlp		39/tcp		resource	# Resource Location Protocol
+rlp		39/udp		resource	# Resource Location Protocol
+nameserver	42/tcp		name		# Host Name Server
+nameserver	42/udp		name		# Host Name Server
+nicname		43/tcp		whois		# Who Is
+nicname		43/udp		whois		# Who Is
+auditd		48/tcp				# Digital Audit Daemon
+auditd		48/udp				# Digital Audit Daemon
+tacacs		49/tcp				# Login Host Protocol (TACACS)
+tacacs		49/udp				# Login Host Protocol (TACACS)
+re-mail-ck	50/tcp				# Remote Mail Checking Protocol
+re-mail-ck	50/udp				# Remote Mail Checking Protocol
+domain		53/tcp				# Domain Name Server
+domain		53/udp				# Domain Name Server
+whois++		63/tcp				# whois++
+whois++		63/udp				# whois++
+tacacs-ds	65/tcp				# TACACS-Database Service
+tacacs-ds	65/udp				# TACACS-Database Service
+bootps		67/tcp				# Bootstrap Protocol Server
+bootps		67/udp				# Bootstrap Protocol Server
+bootpc		68/tcp				# Bootstrap Protocol Client
+bootpc		68/udp				# Bootstrap Protocol Client
+tftp		69/tcp				# Trivial File Transfer
+tftp		69/udp				# Trivial File Transfer
+gopher		70/tcp				# Gopher
+gopher		70/udp				# Gopher
+netrjs-1	71/tcp				# Remote Job Service
+netrjs-1	71/udp				# Remote Job Service
+netrjs-2	72/tcp				# Remote Job Service
+netrjs-2	72/udp				# Remote Job Service
+netrjs-3	73/tcp				# Remote Job Service
+netrjs-3	73/udp				# Remote Job Service
+netrjs-4	74/tcp				# Remote Job Service
+netrjs-4	74/udp				# Remote Job Service
+finger		79/tcp				# Finger
+finger		79/udp				# Finger
+http		80/tcp		www www-http	# World Wide Web HTTP
+http		80/udp		www www-http	# World Wide Web HTTP
+kerberos	88/tcp		kerberos5 krb5	# Kerberos v5
+kerberos	88/udp		kerberos5 krb5	# Kerberos v5
+supdup		95/tcp				# SUPDUP
+supdup		95/udp				# SUPDUP
+tacnews		98/tcp		linuxconf	# TAC News
+tacnews		98/udp				# TAC News
+hostname	101/tcp		hostnames	# NIC Host Name Server
+hostname	101/udp		hostnames	# NIC Host Name Server
+iso-tsap	102/tcp		tsap		# ISO-TSAP Class 0
+iso-tsap	102/udp		tsap		# ISO-TSAP Class 0
+csnet-ns	105/tcp		cso		# Mailbox Name Nameserver, or
+csnet-ns	105/udp		cso		# CCSO name server protocol
+3com-tsmux	106/tcp		poppassd	# 3COM-TSMUX
+3com-tsmux	106/udp		poppassd	# 3COM-TSMUX
+rtelnet		107/tcp				# Remote Telnet Service
+rtelnet		107/udp				# Remote Telnet Service
+snagas		108/tcp				# SNA Gateway Access Server
+snagas		108/udp				# SNA Gateway Access Server
+pop2		109/tcp		pop-2	postoffice	# Post Office Protocol - Version 2
+pop2		109/udp		pop-2		# Post Office Protocol - Version 2
+pop3		110/tcp		pop-3		# Post Office Protocol - Version 3
+pop3		110/udp		pop-3		# Post Office Protocol - Version 3
+sunrpc		111/tcp		portmapper rpcbind	# RPC 4.0 portmapper TCP
+sunrpc		111/udp		portmapper rpcbind	# RPC 4.0 portmapper UDP
+auth		113/tcp		authentication tap ident	# Authentication Service
+auth		113/udp		authentication tap ident	# Authentication Service
+sftp		115/tcp				# Simple File Transfer Protocol
+sftp		115/udp				# Simple File Transfer Protocol
+uucp-path	117/tcp				# UUCP Path Service
+uucp-path	117/udp				# UUCP Path Service
+nntp		119/tcp		readnews untp	# Network News Transfer Protocol
+nntp		119/udp		readnews untp	# Network News Transfer Protocol
+ntp		123/tcp				# Network Time Protocol
+ntp		123/udp				# Network Time Protocol
+netbios-ns	137/tcp				# NETBIOS Name Service
+netbios-ns	137/udp				# NETBIOS Name Service
+netbios-dgm	138/tcp				# NETBIOS Datagram Service
+netbios-dgm	138/udp				# NETBIOS Datagram Service
+netbios-ssn	139/tcp				# NETBIOS session service
+netbios-ssn	139/udp				# NETBIOS session service
+imap		143/tcp		imap2		# Interim Mail Access Protocol
+imap		143/udp		imap2		# Interim Mail Access Protocol
+snmp		161/tcp				# Simple Net Mgmt Proto
+snmp		161/udp				# Simple Net Mgmt Proto
+snmptrap	162/udp		snmp-trap	# Traps for SNMP
+cmip-man	163/tcp				# CMIP/TCP Manager
+cmip-man	163/udp				# CMIP/TCP Manager
+cmip-agent	164/tcp				# CMIP/TCP Agent
+cmip-agent	164/udp				# CMIP/TCP Agent
+mailq		174/tcp				# MAILQ
+mailq		174/udp				# MAILQ
+xdmcp		177/tcp				# X Display Manager Control Protocol
+xdmcp		177/udp				# X Display Manager Control Protocol
+nextstep	178/tcp		NeXTStep NextStep	# NextStep Window Server
+nextstep	178/udp		NeXTStep NextStep	# NextStep Window Server
+bgp		179/tcp				# Border Gateway Protocol
+bgp		179/udp				# Border Gateway Protocol
+prospero	191/tcp				# Prospero Directory Service
+prospero	191/udp				# Prospero Directory Service
+irc		194/tcp				# Internet Relay Chat Protocol
+irc		194/udp				# Internet Relay Chat Protocol
+smux		199/tcp				# SNMP Unix Multiplexer
+smux		199/udp				# SNMP Unix Multiplexer
+at-rtmp		201/tcp				# AppleTalk Routing Maintenance
+at-rtmp		201/udp				# AppleTalk routing Maintenance
+at-nbp		202/tcp				# AppleTalk name binding
+at-nbp		202/udp				# AppleTalk name binding
+at-echo		204/tcp				# AppleTalk echo
+at-echo		204/udp				# AppleTalk echo
+at-zis		206/tcp				# AppleTalk zone information
+at-zis		206/udp				# AppleTalk zone information
+qmtp		209/tcp				# Quick Mail Transfer Protocol
+qmtp		209/udp				# Quick Mail Transfer Protocol
+z39.50		210/tcp		z3950 wais	# ANSI Z39.50
+z39.50		210/udp		z3950 wais	# ANSI Z39.50
+ipx		213/tcp				# IPX
+ipx		213/udp				# IPX
+imap3		220/tcp				# Interactive Mail Access Protocol v3
+imap3		220/udp				# Interactive Mail Access Protocol v3
+link		245/tcp		ttylink		# LINK
+link		245/udp		ttylink		# LINK
+fatserv		347/tcp				# Fatmen Server
+fatserv		347/udp				# Fatmen Server
+rsvp_tunnel	363/tcp
+rsvp_tunnel	363/udp
+odmr		366/tcp				# ODMR
+odmr		366/udp				# ODMR
+rpc2portmap	369/tcp				# Coda portmapper
+rpc2portmap	369/udp				# Coda portmapper
+codaauth2	370/tcp				# Coda authentication server
+codaauth2	370/udp				# Coda authentication server
+ulistproc	372/tcp		ulistserv	# UNIX Listserv
+ulistproc	372/udp		ulistserv	# UNIX Listserv
+ldap		389/tcp				# Lightweight Directory Access Protocol
+ldap		389/udp				# Lightweight Directory Access Protocol
+svrloc          427/tcp				# Server Location
+svrloc          427/udp				# Server Location
+mobileip-agent	434/tcp				# MobileIP-Agent
+mobileip-agent	434/udp				# MobileIP-Agent
+mobilip-mn	435/tcp				# MobilIP-MN
+mobilip-mn	435/udp				# MobilIP-MN
+https		443/tcp				# http protocol over TLS/SSL
+https		443/udp				# http protocol over TLS/SSL
+snpp		444/tcp				# Simple Network Paging Protocol
+snpp		444/udp				# Simple Network Paging Protocol
+microsoft-ds	445/tcp				# Microsoft-DS
+microsoft-ds	445/udp				# Microsoft-DS
+kpasswd		464/tcp		kpwd		# Kerberos `passwd'
+kpasswd		464/udp		kpwd		# Kerberos `passwd'
+urd		465/tcp		smtps		# URL Rendesvous Directory for SSM
+igmpv3lite	465/udp				# IGMP over UDP for SSM
+photuris	468/tcp				# photuris
+photuris	468/udp				# photuris
+saft		487/tcp				# Simple Asynchronous File Transfer
+saft		487/udp				# Simple Asynchronous File Transfer
+gss-http	488/tcp
+gss-http	488/udp
+pim-rp-disc	496/tcp
+pim-rp-disc	496/udp
+isakmp		500/tcp
+isakmp		500/udp
+exec		512/tcp				# remote process execution
+biff		512/udp		comsat		# used by mail system to notify users
+login		513/tcp				# remote login a la telnet
+who		513/udp		whod		# maintains data bases showing who's
+shell		514/tcp		cmd		# no passwords used
+syslog		514/udp
+printer		515/tcp		spooler		# line printer spooler
+printer		515/udp		spooler		# line printer spooler
+talk		517/udp
+ntalk		518/udp
+utime		519/tcp		unixtime
+utime		519/udp		unixtime
+efs		520/tcp				# extended file name server
+router		520/udp		route routed	# RIP
+ripng		521/tcp
+ripng		521/udp
+timed		525/tcp		timeserver
+timed		525/udp		timeserver
+tempo		526/tcp		newdate
+courier		530/tcp		rpc
+conference	531/tcp		chat
+netnews		532/tcp
+netwall		533/udp				# for emergency broadcasts
+iiop		535/tcp				# iiop
+iiop		535/udp				# iiop
+gdomap		538/tcp				# GNUstep distributed objects
+gdomap		538/udp				# GNUstep distributed objects
+uucp		540/tcp		uucpd		# uucp daemon
+klogin		543/tcp				# Kerberized `rlogin' (v5)
+kshell		544/tcp		krcmd		# Kerberized `rsh' (v5)
+dhcpv6-client	546/tcp				# DHCPv6 Client
+dhcpv6-client	546/udp				# DHCPv6 Client
+dhcpv6-server	547/tcp				# DHCPv6 Server
+dhcpv6-server	547/udp				# DHCPv6 Server
+afpovertcp	548/tcp				# AFP over TCP
+afpovertcp	548/udp				# AFP over TCP
+rtsp		554/tcp				# Real Time Stream Control Protocol
+rtsp		554/udp				# Real Time Stream Control Protocol
+remotefs	556/tcp		rfs_server rfs	# Brunhoff remote filesystem
+nntps		563/tcp		snntp		# nntp protocol over TLS/SSL
+nntps		563/udp		snntp		# nntp protocol over TLS/SSL
+whoami		565/tcp				# whoami
+whoami		565/udp				# whoami
+submission	587/tcp		msa		# mail message submission
+submission	587/udp		msa		# mail message submission
+npmp-local	610/tcp		dqs313_qmaster	# npmp-local / DQS
+npmp-local	610/udp		dqs313_qmaster	# npmp-local / DQS
+npmp-gui	611/tcp		dqs313_execd	# npmp-gui / DQS
+npmp-gui	611/udp		dqs313_execd	# npmp-gui / DQS
+hmmp-ind	612/tcp		dqs313_intercell # HMMP Indication / DQS
+hmmp-ind	612/udp		dqs313_intercell # HMMP Indication / DQS
+ipp		631/tcp				# Internet Printing Protocol
+ipp		631/udp				# Internet Printing Protocol
+ldaps		636/tcp		sldap		# ldap protocol over TLS/SSL
+ldaps		636/udp		sldap		# ldap protocol over TLS/SSL
+acap		674/tcp				# ACAP
+acap		674/udp				# ACAP
+ha-cluster	694/tcp				# Heartbeat HA-cluster
+ha-cluster	694/udp				# Heartbeat HA-cluster
+kerberos-adm	749/tcp				# Kerberos `kadmin' (v5)
+kerberos-iv	750/udp		kerberos4 kerberos-sec kdc
+kerberos-iv	750/tcp		kerberos4 kerberos-sec kdc
+quotad	        762/tcp		rquotad
+quotad	        762/udp		rquotad
+webster		765/tcp				# Network dictionary
+webster		765/udp				# Network dictionary
+phonebook	767/tcp				# Network phonebook
+phonebook	767/udp				# Network phonebook
+rsync		873/tcp				# rsync
+rsync		873/udp				# rsync
+swat		901/tcp		smpnameres	# Samba Web Administration Tool
+telnets		992/tcp				# telnet protocol over TLS/SSL
+telnets		992/udp				# telnet protocol over TLS/SSL
+imaps	 	993/tcp				# imap4 protocol over TLS/SSL
+imaps	 	993/udp				# imap4 protocol over TLS/SSL
+ircs		994/tcp				# irc protocol over TLS/SSL
+ircs		994/udp				# irc protocol over TLS/SSL
+pop3s		995/tcp		spop3		# pop3 protocol over TLS/SSL
+pop3s		995/udp		spop3		# pop3 protocol over TLS/SSL
+
+# REGISTERED PORT NUMBERS
+#
+# The Registered Ports are listed by the IANA and on most systems can be
+# used by ordinary user processes or programs executed by ordinary
+# users.
+#
+# Ports are used in the TCP [RFC793] to name the ends of logical
+# connections which carry long term conversations.  For the purpose of
+# providing services to unknown callers, a service contact port is
+# defined.  This list specifies the port used by the server process as
+# its contact port.
+#
+# The IANA registers uses of these ports as a convenience to the
+# community.
+
+socks		1080/tcp			# socks proxy server
+socks		1080/udp			# socks proxy server
+openvpn		1194/tcp	OpenVPN		# James Yonan, November 2004
+openvpn		1194/udp	OpenVPN		# James Yonan, November 2004
+bvcontrol	1236/tcp	rmtcfg		# Daniel J. Walsh, Gracilis Packeten remote config server
+bvcontrol	1236/udp			# Daniel J. Walsh
+h323hostcallsc	1300/tcp			# H323 Host Call Secure
+h323hostcallsc	1300/udp			# H323 Host Call Secure
+ms-sql-s	1433/tcp			# Microsoft-SQL-Server
+ms-sql-s	1433/udp			# Microsoft-SQL-Server
+ms-sql-m	1434/tcp			# Microsoft-SQL-Monitor
+ms-sql-m	1434/udp			# Microsoft-SQL-Monitor
+ica		1494/tcp			# Citrix ICA Client
+ica		1494/udp			# Citrix ICA Client
+wins		1512/tcp			# Microsoft's Windows Internet Name Service
+wins		1512/udp			# Microsoft's Windows Internet Name Service
+ingreslock	1524/tcp
+ingreslock	1524/udp
+prospero-np	1525/tcp			# Prospero non-privileged
+prospero-np	1525/udp
+datametrics	1645/tcp	old-radius	# datametrics / old radius entry
+datametrics	1645/udp	old-radius	# datametrics / old radius entry
+sa-msg-port	1646/tcp	old-radacct	# sa-msg-port / old radacct entry
+sa-msg-port	1646/udp	old-radacct	# sa-msg-port / old radacct entry
+kermit		1649/tcp
+kermit		1649/udp
+l2tp		1701/tcp	l2f
+l2tp		1701/udp	l2f
+h323gatedisc	1718/tcp
+h323gatedisc	1718/udp
+h323gatestat	1719/tcp
+h323gatestat	1719/udp
+h323hostcall	1720/tcp
+h323hostcall	1720/udp
+tftp-mcast	1758/tcp
+tftp-mcast	1758/udp
+mtftp		1759/tcp
+mtftp		1759/udp
+hello		1789/tcp
+hello		1789/udp
+radius		1812/tcp			# Radius
+radius		1812/udp			# Radius
+radius-acct	1813/tcp	radacct		# Radius Accounting
+radius-acct	1813/udp	radacct		# Radius Accounting
+mtp		1911/tcp			#
+mtp		1911/udp			#
+hsrp		1985/tcp			# Cisco Hot Standby Router Protocol
+hsrp		1985/udp			# Cisco Hot Standby Router Protocol
+licensedaemon	1986/tcp			# Cisco license management
+licensedaemon	1986/udp			# Cisco license management
+tr-rsrb-p1	1987/tcp			# Cisco RSRB Priority 1 port
+tr-rsrb-p1	1987/udp			# Cisco RSRB Priority 1 port
+tr-rsrb-p2	1988/tcp			# Cisco RSRB Priority 2 port
+tr-rsrb-p2	1988/udp			# Cisco RSRB Priority 2 port
+tr-rsrb-p3	1989/tcp	mshnet		# Cisco RSRB Priority 3 port
+tr-rsrb-p3	1989/udp	mshnet		# Cisco RSRB Priority 3 port
+stun-p1		1990/tcp			# Cisco STUN Priority 1 port
+stun-p1		1990/udp			# Cisco STUN Priority 1 port
+stun-p2		1991/tcp			# Cisco STUN Priority 2 port
+stun-p2		1991/udp			# Cisco STUN Priority 2 port
+stun-p3		1992/tcp	ipsendmsg	# Cisco STUN Priority 3 port
+stun-p3		1992/udp	ipsendmsg	# Cisco STUN Priority 3 port
+snmp-tcp-port	1993/tcp			# Cisco SNMP TCP port
+snmp-tcp-port	1993/udp			# Cisco SNMP TCP port
+stun-port	1994/tcp			# Cisco serial tunnel port
+stun-port	1994/udp			# Cisco serial tunnel port
+perf-port	1995/tcp			# Cisco perf port
+perf-port	1995/udp			# Cisco perf port
+tr-rsrb-port	1996/tcp			# Cisco Remote SRB port
+tr-rsrb-port	1996/udp			# Cisco Remote SRB port
+gdp-port	1997/tcp			# Cisco Gateway Discovery Protocol
+gdp-port	1997/udp			# Cisco Gateway Discovery Protocol
+x25-svc-port	1998/tcp			# Cisco X.25 service (XOT)
+x25-svc-port	1998/udp			# Cisco X.25 service (XOT)
+tcp-id-port	1999/tcp			# Cisco identification port
+tcp-id-port	1999/udp			# Cisco identification port
+sieve-filter	2000/tcp	cisco-sccp	# Cisco SCCP, Sieve Mail Filter Daemon
+sieve-filter	2000/udp	cisco-sccp	# Cisco SCCP, Sieve Mail Filter Daemon
+nfs		2049/tcp	nfsd
+nfs		2049/udp	nfsd
+zephyr-srv	2102/tcp			# Zephyr server
+zephyr-srv	2102/udp			# Zephyr server
+zephyr-clt	2103/tcp			# Zephyr serv-hm connection
+zephyr-clt	2103/udp			# Zephyr serv-hm connection
+zephyr-hm	2104/tcp			# Zephyr hostmanager
+zephyr-hm	2104/udp			# Zephyr hostmanager
+cvspserver	2401/tcp			# CVS client/server operations
+cvspserver	2401/udp			# CVS client/server operations
+venus		2430/tcp			# codacon port
+venus		2430/udp			# Venus callback/wbc interface
+venus-se	2431/tcp			# tcp side effects
+venus-se	2431/udp			# udp sftp side effect
+codasrv		2432/tcp			# not used
+codasrv		2432/udp			# server port
+codasrv-se	2433/tcp			# tcp side effects
+codasrv-se	2433/udp			# udp sftp side effectQ
+msp		2438/tcp			# Message send protocol?
+msp		2438/udp			# Message send protocol?
+
+# Ports numbered 2600 through 2606 are used by the zebra package.  The primary
+# names are the registered names, and the zebra names are listed as aliases.
+hpstgmgr	2600/tcp	zebrasrv	# HPSTGMGR
+hpstgmgr	2600/udp			# HPSTGMGR
+discp-client	2601/tcp	zebra		# discp client
+discp-client	2601/udp			# discp client
+discp-server	2602/tcp	ripd		# discp server
+discp-server	2602/udp			# discp server
+servicemeter	2603/tcp	ripngd		# Service Meter
+servicemeter	2603/udp			# Service Meter
+nsc-ccs		2604/tcp	ospfd		# NSC CCS
+nsc-ccs		2604/udp			# NSC CCS
+nsc-posa	2605/tcp	bgpd		# NSC POSA
+nsc-posa	2605/udp			# NSC POSA
+netmon		2606/tcp	ospf6d		# Dell Netmon
+netmon		2606/udp			# Dell Netmon
+dict		2628/tcp			# RFC 2229
+dict		2628/udp			# RFC 2229
+corbaloc	2809/tcp			# CORBA naming service locator
+icpv2		3130/tcp			# Internet Cache Protocol V2 (Squid)
+icpv2		3130/udp			# Internet Cache Protocol V2 (Squid)
+mysql		3306/tcp			# MySQL
+mysql		3306/udp			# MySQL
+trnsprntproxy   3346/tcp			# Trnsprnt Proxy
+trnsprntproxy   3346/udp			# Trnsprnt Proxy
+pxe		4011/udp			# PXE server
+sieve		4190/tcp			# ManageSieve Protocol
+fud		4201/udp			# Cyrus IMAP FUD Daemon
+rwhois		4321/tcp			# Remote Who Is
+rwhois		4321/udp			# Remote Who Is
+krb524		4444/tcp			# Kerberos 5 to 4 ticket xlator
+krb524		4444/udp			# Kerberos 5 to 4 ticket xlator
+rfe		5002/tcp			# Radio Free Ethernet
+rfe		5002/udp			# Actually uses UDP only
+xmpp-client	5222/tcp	jabber-client	# Jabber Client Connection
+xmpp-client	5222/udp	jabber-client	# Jabber Client Connection
+xmpp-server	5269/tcp	jabber-server	# Jabber Server Connection
+xmpp-server	5269/udp	jabber-server	# Jabber Server Connection
+xmpp-bosh	5280/tcp			# Bidirectional-streams Over Synchronous HTTP (BOSH)
+cfengine	5308/tcp			# CFengine
+cfengine	5308/udp			# CFengine
+cvsup		5999/tcp	CVSup		# CVSup file transfer/John Polstra/FreeBSD
+cvsup		5999/udp	CVSup		# CVSup file transfer/John Polstra/FreeBSD
+x11		6000/tcp	X		# the X Window System
+afs3-fileserver	7000/tcp			# file server itself
+afs3-fileserver	7000/udp			# file server itself
+afs3-callback	7001/tcp			# callbacks to cache managers
+afs3-callback	7001/udp			# callbacks to cache managers
+afs3-prserver	7002/tcp			# users & groups database
+afs3-prserver	7002/udp			# users & groups database
+afs3-vlserver	7003/tcp			# volume location database
+afs3-vlserver	7003/udp			# volume location database
+afs3-kaserver	7004/tcp			# AFS/Kerberos authentication service
+afs3-kaserver	7004/udp			# AFS/Kerberos authentication service
+afs3-volser	7005/tcp			# volume managment server
+afs3-volser	7005/udp			# volume managment server
+afs3-errors	7006/tcp			# error interpretation service
+afs3-errors	7006/udp			# error interpretation service
+afs3-bos	7007/tcp			# basic overseer process
+afs3-bos	7007/udp			# basic overseer process
+afs3-update	7008/tcp			# server-to-server updater
+afs3-update	7008/udp			# server-to-server updater
+afs3-rmtsys	7009/tcp			# remote cache manager service
+afs3-rmtsys	7009/udp			# remote cache manager service
+git		9418/tcp			# git pack transfer service
+git		9418/udp			# git pack transfer service
+sd		9876/tcp			# Session Director
+sd		9876/udp			# Session Director
+amanda		10080/tcp			# amanda backup services
+amanda		10080/udp			# amanda backup services
+pgpkeyserver	11371/tcp			# PGP/GPG public keyserver
+pgpkeyserver	11371/udp			# PGP/GPG public keyserver
+h323callsigalt	11720/tcp			# H323 Call Signal Alternate
+h323callsigalt	11720/udp			# H323 Call Signal Alternate
+
+bprd		13720/tcp			# BPRD (VERITAS NetBackup)
+bprd		13720/udp			# BPRD (VERITAS NetBackup)
+bpdbm		13721/tcp			# BPDBM (VERITAS NetBackup)
+bpdbm		13721/udp			# BPDBM (VERITAS NetBackup)
+bpjava-msvc	13722/tcp			# BP Java MSVC Protocol
+bpjava-msvc	13722/udp			# BP Java MSVC Protocol
+vnetd		13724/tcp			# Veritas Network Utility
+vnetd		13724/udp			# Veritas Network Utility
+bpcd		13782/tcp			# VERITAS NetBackup
+bpcd		13782/udp			# VERITAS NetBackup
+vopied		13783/tcp			# VOPIED Protocol
+vopied		13783/udp			# VOPIED Protocol
+
+# This port is registered as wnn6, but also used under the unregistered name
+# "wnn4" by the FreeWnn package.
+wnn6		22273/tcp	wnn4
+wnn6		22273/udp	wnn4
+
+quake		26000/tcp
+quake		26000/udp
+wnn6-ds		26208/tcp
+wnn6-ds		26208/udp
+traceroute	33434/tcp
+traceroute	33434/udp
+
+#
+# Datagram Delivery Protocol services
+#
+rtmp		1/ddp				# Routing Table Maintenance Protocol
+nbp		2/ddp				# Name Binding Protocol
+echo		4/ddp				# AppleTalk Echo Protocol
+zip		6/ddp				# Zone Information Protocol
+
+#
+# Kerberos (Project Athena/MIT) services
+# Note that these are for Kerberos v4, and are unofficial.  Sites running
+# v4 should uncomment these and comment out the v5 entries above.
+#
+kerberos_master	751/udp				# Kerberos authentication
+kerberos_master	751/tcp				# Kerberos authentication
+passwd_server	752/udp				# Kerberos passwd server
+krbupdate	760/tcp		kreg		# Kerberos registration
+kpop		1109/tcp			# Pop with Kerberos
+knetd		2053/tcp			# Kerberos de-multiplexor
+
+#
+# Kerberos 5 services, also not registered with IANA
+#
+krb5_prop	754/tcp				# Kerberos slave propagation
+eklogin		2105/tcp			# Kerberos encrypted rlogin
+
+#
+# Unregistered but necessary (for NetBSD) services
+#
+supfilesrv	871/tcp				# SUP server
+supfiledbg	1127/tcp			# SUP debugging
+
+#
+# Unregistered but useful/necessary other services
+#
+netstat		15/tcp				# (was once asssigned, no more)
+gii		616/tcp				# gated interactive interface
+omirr		808/tcp		omirrd		# online mirror
+omirr		808/udp		omirrd		# online mirror
+rndc		953/tcp				# rndc control sockets (BIND 9)
+rndc		953/udp				# rndc control sockets (BIND 9)
+skkserv		1178/tcp			# SKK Japanese input method
+xtel		1313/tcp			# french minitel
+lotusnote	1352/tcp	lotusnotes	# Lotus notes
+lotusnote	1352/udp	lotusnotes	# Lotus notes
+support		1529/tcp	prmsd gnatsd	# GNATS, cygnus bug tracker
+cfinger		2003/tcp			# GNU Finger
+ninstall	2150/tcp			# ninstall service
+ninstall	2150/udp			# ninstall service
+afbackup	2988/tcp			# Afbackup system
+afbackup	2988/udp			# Afbackup system
+squid		3128/tcp			# squid web proxy
+prsvp		3455/tcp			# RSVP Port
+prsvp		3455/udp			# RSVP Port
+distcc		3632/tcp			# distcc
+svn		3690/tcp			# Subversion
+svn		3690/udp			# Subversion
+postgres	5432/tcp			# POSTGRES
+postgres	5432/udp			# POSTGRES
+fax		4557/tcp			# FAX transmission service        (old)
+hylafax		4559/tcp			# HylaFAX client-server protocol  (new)
+sgi-dgl		5232/tcp			# SGI Distributed Graphics
+sgi-dgl		5232/udp
+noclog		5354/tcp			# noclogd with TCP (nocol)
+noclog		5354/udp			# noclogd with UDP (nocol)
+hostmon		5355/tcp			# hostmon uses TCP (nocol)
+hostmon		5355/udp			# hostmon uses TCP (nocol)
+canna		5680/tcp
+x11-ssh-offset	6010/tcp			# SSH X11 forwarding offset
+sane-port	6566/tcp	sane saned	# SANE Control Port
+sane-port	6566/udp	sane saned	# SANE Control Port
+ircd		6667/tcp			# Internet Relay Chat
+ircd		6667/udp			# Internet Relay Chat
+xfs		7100/tcp			# X font server
+tircproxy	7666/tcp			# Tircproxy
+http-alt	8008/tcp
+http-alt	8008/udp
+webcache	8080/tcp			# WWW caching service
+webcache	8080/udp			# WWW caching service
+tproxy		8081/tcp			# Transparent Proxy
+tproxy		8081/udp			# Transparent Proxy
+jetdirect	9100/tcp	laserjet hplj	#
+mandelspawn	9359/udp	mandelbrot	# network mandelbrot
+kamanda		10081/tcp			# amanda backup services (Kerberos)
+kamanda		10081/udp			# amanda backup services (Kerberos)
+amandaidx	10082/tcp			# amanda backup services
+amidxtape	10083/tcp			# amanda backup services
+ladcca		14541/tcp			# LADCCA client/server protocol
+isdnlog		20011/tcp			# isdn logging system
+isdnlog		20011/udp			# isdn logging system
+vboxd		20012/tcp			# voice box system
+vboxd		20012/udp			# voice box system
+wnn4_Kr		22305/tcp			# used by the kWnn package
+wnn4_Cn		22289/tcp			# used by the cWnn package
+wnn4_Tw		22321/tcp			# used by the tWnn package
+binkp		24554/tcp			# Binkley
+binkp		24554/udp			# Binkley
+asp		27374/tcp			# Address Search Protocol
+asp		27374/udp			# Address Search Protocol
+nmicmp		27777/tcp			# nmicmpd service
+tfido		60177/tcp			# Ifmail
+tfido		60177/udp			# Ifmail
+fido		60179/tcp			# Ifmail
+fido		60179/udp			# Ifmail
+
+# Local services
+root:x:20321::::::
+bin:*:20321::::::
+daemon:*:20321::::::
+adm:*:20321::::::
+lp:*:20321::::::
+mail:*:20321::::::
+news:*:20321::::::
+uucp:*:20321::::::
+games:*:20321::::::
+ftp:*:20321::::::
+squid:*:20321::::::
+named:*:20321::::::
+nscd:*:20321::::::
+rpcuser:*:20321::::::
+rpc:*:20321::::::
+mailman:*:20321::::::
+postfix:*:20321::::::
+popa3d:*:20321::::::
+xfs:*:20321::::::
+mysql:*:20321::::::
+postgres:*:20321::::::
+gdm:*:20321::::::
+ldap:*:20321::::::
+exim:*:20321::::::
+apache:*:20321::::::
+_nobody99:*:20321::::::
+nobody:*:20321::::::
+/bin/sh
+/usr/bin/sh
+/bin/bash
+/usr/bin/bash
+/bin/ash
+/usr/bin/ash
+/bin/bsh
+/usr/bin/bsh
+/bin/csh
+/usr/bin/csh
+/bin/tcsh
+/usr/bin/tcsh
+/bin/ksh
+/usr/bin/ksh
+/bin/zsh
+/usr/bin/zsh
+# Sample configuration file for smartd.  See man smartd.conf.
+
+# Home page is: https://www.smartmontools.org
+
+# smartd will re-read the configuration file if it receives a HUP
+# signal
+
+# The file gives a list of devices to monitor using smartd, with one
+# device per line. Text after a hash (#) is ignored, and you may use
+# spaces and tabs for white space. You may use '\' to continue lines.
+
+# The word DEVICESCAN will cause any remaining lines in this
+# configuration file to be ignored: it tells smartd to scan for all
+# ATA and SCSI devices.  DEVICESCAN may be followed by any of the
+# Directives listed below, which will be applied to all devices that
+# are found.  Most users should comment out DEVICESCAN and explicitly
+# list the devices that they wish to monitor.
+#DEVICESCAN
+
+# Alternative setting to check the SMART health status of disks,
+# send warning emails to root, check devices unless they are in SLEEP
+# or STANDBY mode, with maximum number of skipped checks set to 12 hours.
+DEVICESCAN -H -m root -n standby,24,q
+
+# Alternative setting to ignore temperature and power-on hours reports
+# in syslog.
+#DEVICESCAN -I 194 -I 231 -I 9
+
+# Alternative setting to report more useful raw temperature in syslog.
+#DEVICESCAN -R 194 -R 231 -I 9
+
+# Alternative setting to report raw temperature changes >= 5 Celsius
+# and min/max temperatures.
+#DEVICESCAN -I 194 -I 231 -I 9 -W 5
+
+# First ATA/SATA or SCSI/SAS disk.  Monitor all attributes, enable
+# automatic online data collection, automatic Attribute autosave, and
+# start a short self-test every day between 2-3am, and a long self test
+# Saturdays between 3-4am.
+#/dev/sda -a -o on -S on -s (S/../.././02|L/../../6/03)
+
+# Monitor SMART status, ATA Error Log, Self-test log, and track
+# changes in all attributes except for attribute 194
+#/dev/sdb -H -l error -l selftest -t -I 194
+
+# Monitor all attributes except normalized Temperature (usually 194),
+# but track Temperature changes >= 4 Celsius, report Temperatures
+# >= 45 Celsius and changes in Raw value of Reallocated_Sector_Ct (5).
+# Send mail on SMART failures or when Temperature is >= 55 Celsius.
+#/dev/sdc -a -I 194 -W 4,45,55 -R 5 -m admin@example.com
+
+# An ATA disk may appear as a SCSI device to the OS. If a SCSI to
+# ATA Translation (SAT) layer is between the OS and the device then
+# this can be flagged with the '-d sat' option.
+#/dev/sda -a -d sat
+
+# A very silent check.  Only report SMART health status if it fails
+# But send an email in this case
+#/dev/sdc -H -C 0 -U 0 -m admin@example.com
+
+# First two SCSI disks.  This will monitor everything that smartd can
+# monitor.  Start extended self-tests Wednesdays between 6-7pm and
+# Sundays between 1-2 am
+#/dev/sda -d scsi -s L/../../3/18
+#/dev/sdb -d scsi -s L/../../7/01
+
+# Monitor 2 SATA (not SAS) disks connected to a 3ware 9000 controller which
+# uses the 3w-sas driver (Linux). Start long self-tests Tuesdays
+# between 1-2 and 3-4 am.
+# On FreeBSD /dev/tws0 should be used instead
+#/dev/twl0 -d 3ware,0 -a -s L/../../2/01
+#/dev/twl0 -d 3ware,1 -a -s L/../../2/03
+
+# Monitor 2 disks connected to the first HP SmartArray controller which uses
+# the Linux cciss driver. Start long self-tests on Sunday nights and short
+# self-tests every night and send errors to root.
+#/dev/sda -d cciss,0 -a -s (L/../../7/02|S/../.././02) -m root
+#/dev/sda -d cciss,1 -a -s (L/../../7/03|S/../.././03) -m root
+
+# Monitor 3 ATA disks directly connected to a HighPoint RocketRAID. Start long
+# self-tests Sundays between 1-2, 2-3, and 3-4 am. 
+#/dev/sdd -d hpt,1/1 -a -s L/../../7/01
+#/dev/sdd -d hpt,1/2 -a -s L/../../7/02
+#/dev/sdd -d hpt,1/3 -a -s L/../../7/03
+
+# Monitor 2 ATA disks connected to the same PMPort which connected to the
+# HighPoint RocketRAID. Start long self-tests Tuesdays between 1-2 and 3-4 am
+#/dev/sdd -d hpt,1/4/1 -a -s L/../../2/01
+#/dev/sdd -d hpt,1/4/2 -a -s L/../../2/03
+
+# HERE IS A LIST OF DIRECTIVES FOR THIS CONFIGURATION FILE.
+# PLEASE SEE THE smartd.conf MAN PAGE FOR DETAILS
+#
+#   -d TYPE Set the device type: ata, scsi[+TYPE], nvme[,NSID],
+#           sat[,auto][,N][+TYPE], usbcypress[,X], usbjmicron[,p][,x][,N],
+#           usbprolific, usbsunplus, sntasmedia, sntjmicron[,NSID], sntrealtek,
+#           ... (platform specific)
+#   -T TYPE Set the tolerance to one of: normal, permissive
+#   -o VAL  Enable/disable automatic offline tests (on/off)
+#   -S VAL  Enable/disable attribute autosave (on/off)
+#   -n MODE No check if: never, sleep[,N][,q], standby[,N][,q], idle[,N][,q]
+#   -H      Monitor SMART Health Status, report if failed
+#   -s REG  Do Self-Test at time(s) given by regular expression REG
+#   -l TYPE Monitor SMART log or self-test status:
+#           error, selftest, xerror, offlinests[,ns], selfteststs[,ns]
+#   -l scterc,R,W  Set SCT Error Recovery Control
+#   -e      Change device setting: aam,[N|off], apm,[N|off], dsn,[on|off],
+#           lookahead,[on|off], security-freeze, standby,[N|off], wcache,[on|off]
+#   -f      Monitor 'Usage' Attributes, report failures
+#   -m ADD  Send email warning to address ADD
+#   -M TYPE Modify email warning behavior (see man page)
+#   -p      Report changes in 'Prefailure' Attributes
+#   -u      Report changes in 'Usage' Attributes
+#   -t      Equivalent to -p and -u Directives
+#   -r ID   Also report Raw values of Attribute ID with -p, -u or -t
+#   -R ID   Track changes in Attribute ID Raw value with -p, -u or -t
+#   -i ID   Ignore Attribute ID for -f Directive
+#   -I ID   Ignore Attribute ID for -p, -u or -t Directive
+#   -C ID[+] Monitor [increases of] Current Pending Sectors in Attribute ID
+#   -U ID[+] Monitor [increases of] Offline Uncorrectable Sectors in Attribute ID
+#   -W D,I,C Monitor Temperature D)ifference, I)nformal limit, C)ritical limit
+#   -v N,ST Modifies labeling of Attribute N (see man page)
+#   -P TYPE Drive-specific presets: use, ignore, show, showall
+#   -a      Default: -H -f -t -l error -l selftest -l selfteststs -C 197 -U 198
+#   -F TYPE Use firmware bug workaround:
+#           none, nologdir, samsung, samsung2, samsung3, xerrorlba
+#   -c i=N  Set interval between disk checks to N seconds
+#    #      Comment: text after a hash sign is ignored
+#    \      Line continuation character
+# Attribute ID is a decimal integer 1 <= ID <= 255
+# except for -C and -U, where ID = 0 turns them off.
+#! /bin/sh
+#
+# smartd warning script
+#
+# Home page of code is: https://www.smartmontools.org
+#
+# Copyright (C) 2012-22 Christian Franke
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+#
+# $Id: smartd_warning.sh.in 5428 2022-12-31 15:55:43Z chrfranke $
+#
+
+set -e
+
+# Set by config.status
+export PATH="/usr/local/bin:/usr/bin:/bin"
+PACKAGE="smartmontools"
+VERSION="7.4"
+prefix="/usr"
+sysconfdir="/etc"
+smartdscriptdir="${sysconfdir}"
+
+# Default mailer
+os_mailer="mail"
+
+# Plugin directory (disabled if empty)
+plugindir="${smartdscriptdir}/smartd_warning.d"
+
+# Detect accidental use of '-M exec /path/to/smartd_warning.sh'.
+if [ -n "$SMARTD_SUBJECT" ]; then
+  echo "$0: SMARTD_SUBJECT is already set - possible recursion" >&2
+  exit 1
+fi
+
+# Parse options
+dryrun=
+case $1 in
+  --dryrun) dryrun=t; shift ;;
+esac
+
+if [ $# != 0 ]; then
+  cat <<EOF
+smartd $VERSION warning message script
+
+Usage:
+  export SMARTD_MAILER='Path to external script, empty for "$os_mailer"'
+  export SMARTD_ADDRESS='Space separated mail addresses, empty if none'
+  export SMARTD_MESSAGE='Error Message'
+  export SMARTD_FAILTYPE='Type of failure, "EMailTest" for tests'
+  export SMARTD_TFIRST='Date of first message sent, empty if none'
+  #export SMARTD_TFIRSTEPOCH='time_t format of above'
+  export SMARTD_PREVCNT='Number of previous messages, 0 if none'
+  export SMARTD_NEXTDAYS='Number of days until next message, empty if none'
+  export SMARTD_DEVICEINFO='Device identify information'
+  #export SMARTD_DEVICE='Device name'
+  #export SMARTD_DEVICESTRING='Annotated device name'
+  #export SMARTD_DEVICETYPE='Device type from -d directive, "auto" if none'
+  $0 [--dryrun]
+EOF
+  exit 1
+fi
+
+if [ -z "${SMARTD_ADDRESS}${SMARTD_MAILER}" ]; then
+  echo "$0: SMARTD_ADDRESS or SMARTD_MAILER must be set" >&2
+  exit 1
+fi
+
+# Get host and domain names
+for cmd in 'hostname' 'uname -n' 'echo "[Unknown]"'; do
+  hostname=`eval $cmd 2>/dev/null` || continue
+  test -n "$hostname" || continue
+  break
+done
+
+dnsdomain=${hostname#*.}
+if [ "$dnsdomain" != "$hostname" ]; then
+  # hostname command printed FQDN
+  hostname=${hostname%%.*}
+else
+  for cmd in 'dnsdomainname' 'hostname -d' 'echo'; do
+    dnsdomain=`eval $cmd 2>/dev/null` || continue
+    break
+  done
+  test "$dnsdomain" != "(none)" || dnsdomain=
+fi
+
+for cmd in 'nisdomainname' 'hostname -y' 'domainname' 'echo'; do
+  nisdomain=`eval $cmd 2>/dev/null` || continue
+  break
+done
+test "$nisdomain" != "(none)" || nisdomain=
+
+# Format subject
+export SMARTD_SUBJECT="SMART error (${SMARTD_FAILTYPE-[SMARTD_FAILTYPE]}) detected on host: $hostname"
+
+# Format message
+fullmessage=`
+  echo "This message was generated by the smartd daemon running on:"
+  echo
+  echo "   host name:  $hostname"
+  echo "   DNS domain: ${dnsdomain:-[Empty]}"
+  test -z "$nisdomain" ||
+    echo "   NIS domain: $nisdomain"
+  #test -z "$USERDOMAIN" ||
+  #  echo "   Win domain: $USERDOMAIN"
+  echo
+  echo "The following warning/error was logged by the smartd daemon:"
+  echo
+  echo "${SMARTD_MESSAGE-[SMARTD_MESSAGE]}"
+  echo
+  echo "Device info:"
+  echo "${SMARTD_DEVICEINFO-[SMARTD_DEVICEINFO]}"
+  echo
+  echo "For details see host's SYSLOG."
+  if [ "$SMARTD_FAILTYPE" != "EmailTest" ]; then
+    echo
+    echo "You can also use the smartctl utility for further investigation."
+    test "$SMARTD_PREVCNT" = "0" ||
+      echo "The original message about this issue was sent at ${SMARTD_TFIRST-[SMARTD_TFIRST]}"
+    case $SMARTD_NEXTDAYS in
+      '') echo "No additional messages about this problem will be sent." ;;
+      0)  echo "Another message will be sent upon next check if the problem persists." ;;
+      1)  echo "Another message will be sent in 24 hours if the problem persists." ;;
+      *)  echo "Another message will be sent in $SMARTD_NEXTDAYS days if the problem persists." ;;
+    esac
+  fi
+`
+
+# Check whether a message line begins with the default 'mail' command escape char '~'.
+# Heuristically detect dangerous command escapes for possible other escape characters.
+esc=`echo "$fullmessage" | sed -n -e '/^~/p' -e '/^[^ 0-9A-Za-z][[:space:]]*[!:<r|][[:space:]]/p'`
+if [ -n "$esc" ]; then
+  echo "$0: Security: Message contains possible 'mail' command escape" >&2
+  exit 1
+fi
+
+# Export message with trailing newline
+export SMARTD_FULLMESSAGE="$fullmessage
+"
+
+# Run plugin scripts if requested
+unset SMARTD_ADDRESS_ORIG
+case " $SMARTD_ADDRESS" in
+  *\ @*)
+    # Collect and remove plugin names from SMARTD_ADDRESS
+    export SMARTD_ADDRESS_ORIG=$SMARTD_ADDRESS
+    SMARTD_ADDRESS=
+    plugins=
+    for ad in $SMARTD_ADDRESS_ORIG; do
+      case $ad in
+        @ALL)
+          if [ -n "$plugindir" ]; then
+            for cmd in "$plugindir"/*; do
+              if [ -f "$cmd" ] && [ -x "$cmd" ]; then
+                plugins="${plugins}${plugins:+ }${cmd##*/}"
+              fi
+            done
+          fi
+          ;;
+        @?*)
+          if [ -n "$plugindir" ]; then
+            plugins="${plugins}${plugins:+ }${ad#@}"
+          fi
+          ;;
+        *)
+          SMARTD_ADDRESS="${SMARTD_ADDRESS}${SMARTD_ADDRESS:+ }$ad"
+          ;;
+      esac
+    done
+
+    # Run all scripts
+    if [ -n "$plugins" ]; then
+      if [ -n "$dryrun" ]; then
+        echo "export SMARTD_ADDRESS='$SMARTD_ADDRESS'"
+        echo "export SMARTD_ADDRESS_ORIG='$SMARTD_ADDRESS_ORIG'"
+        echo "export SMARTD_SUBJECT='$SMARTD_SUBJECT'"
+        echo "export SMARTD_FULLMESSAGE='$SMARTD_FULLMESSAGE'"
+      fi
+      for p in $plugins; do
+        cmd="$plugindir/$p"
+        if [ -f "$cmd" ]; then
+          if [ -x "$cmd" ]; then
+            if [ -n "$dryrun" ]; then
+              echo "$cmd </dev/null"
+            else
+              rc=0
+              "$cmd" </dev/null || rc=$?
+              if [ $rc != 0 ]; then
+                echo "$cmd: exit $rc" >&2
+                exit $rc
+              fi
+            fi
+          fi
+        else
+          echo "$cmd: not found" >&2
+          exit 1
+        fi
+      done
+    fi
+
+    # Send email to remaining addresses
+    test -n "$SMARTD_ADDRESS" || exit 0
+    ;;
+esac
+
+# Send mail or run command
+if [ -n "$SMARTD_ADDRESS" ]; then
+
+  # Send mail, use platform mailer by default
+  test -n "$SMARTD_MAILER" || SMARTD_MAILER=$os_mailer
+  if [ -n "$dryrun" ]; then
+    echo "exec '$SMARTD_MAILER' -s '$SMARTD_SUBJECT' $SMARTD_ADDRESS <<EOF
+$fullmessage
+EOF"
+  else
+    exec "$SMARTD_MAILER" -s "$SMARTD_SUBJECT" $SMARTD_ADDRESS <<EOF
+$fullmessage
+EOF
+  fi
+
+elif [ -n "$SMARTD_MAILER" ]; then
+
+  # Run command
+  if [ -n "$dryrun" ]; then
+    echo "export SMARTD_SUBJECT='$SMARTD_SUBJECT'"
+    echo "export SMARTD_FULLMESSAGE='$SMARTD_FULLMESSAGE'"
+    echo "exec '$SMARTD_MAILER' </dev/null"
+  else
+    unset SMARTD_ADDRESS
+    exec "$SMARTD_MAILER" </dev/null
+  fi
+
+fi
+user:100000:65536
+user:100000:65536
+#
+# Default /etc/sudo.conf file
+#
+# Sudo plugins:
+#   Plugin plugin_name plugin_path plugin_options ...
+#
+# The plugin_path is relative to /usr/lib64/sudo unless
+#   fully qualified.
+# The plugin_name corresponds to a global symbol in the plugin
+#   that contains the plugin interface structure.
+# The plugin_options are optional.
+#
+# The sudoers plugin is used by default if no Plugin lines are present.
+#Plugin sudoers_policy sudoers.so
+#Plugin sudoers_io sudoers.so
+#Plugin sudoers_audit sudoers.so
+
+#
+# Sudo askpass:
+#   Path askpass /path/to/askpass
+#
+# An askpass helper program may be specified to provide a graphical
+# password prompt for "sudo -A" support.  Sudo does not ship with its
+# own askpass program but can use the OpenSSH askpass.
+#
+# Use the OpenSSH askpass
+#Path askpass /usr/X11R6/bin/ssh-askpass
+#
+# Use the Gnome OpenSSH askpass
+#Path askpass /usr/libexec/openssh/gnome-ssh-askpass
+
+#
+# Sudo device search path:
+#   Path devsearch /dev/path1:/dev/path2:/dev
+#
+# A colon-separated list of paths to check when searching for a user's
+# terminal device.
+#
+#Path devsearch /dev/pts:/dev/vt:/dev/term:/dev/zcons:/dev/pty:/dev
+
+#
+# Sudo command interception:
+#   Path intercept /path/to/sudo_intercept.so
+#
+# Path to a shared library containing replacements for the execv(),
+# execve() and fexecve() library functions that perform a policy check
+# to verify the command is allowed and simply return an error if not.
+# This is used to implement the "intercept" functionality on systems that
+# support LD_PRELOAD or its equivalent.
+#
+# The compiled-in value is usually sufficient and should only be changed
+# if you rename or move the sudo_intercept.so file.
+#
+#Path intercept /usr/lib64/sudo/sudo_intercept.so
+
+#
+# Sudo noexec:
+#   Path noexec /path/to/sudo_noexec.so
+#
+# Path to a shared library containing replacements for the execv(),
+# execve() and fexecve() library functions that just return an error.
+# This is used to implement the "noexec" functionality on systems that
+# support LD_PRELOAD or its equivalent.
+#
+# The compiled-in value is usually sufficient and should only be changed
+# if you rename or move the sudo_noexec.so file.
+#
+#Path noexec /usr/lib64/sudo/sudo_noexec.so
+
+#
+# Sudo plugin directory:
+#   Path plugin_dir /path/to/plugins
+#
+# The default directory to use when searching for plugins that are
+# specified without a fully qualified path name.
+#
+#Path plugin_dir /usr/lib64/sudo
+
+#
+# Core dumps:
+#   Set disable_coredump true|false
+#
+# By default, sudo disables core dumps while it is executing (they
+# are re-enabled for the command that is run).
+# To aid in debugging sudo problems, you may wish to enable core
+# dumps by setting "disable_coredump" to false.
+#
+#Set disable_coredump false
+
+#
+# User groups:
+#   Set group_source static|dynamic|adaptive
+#
+# Sudo passes the user's group list to the policy plugin.
+# If the user is a member of the maximum number of groups (usually 16),
+# sudo will query the group database directly to be sure to include
+# the full list of groups.
+#
+# On some systems, this can be expensive so the behavior is configurable.
+# The "group_source" setting has three possible values:
+#   static   - use the user's list of groups returned by the kernel.
+#   dynamic  - query the group database to find the list of groups.
+#   adaptive - if user is in less than the maximum number of groups.
+#	       use the kernel list, else query the group database.
+#
+#Set group_source static
+
+#
+# Sudo interface probing:
+#   Set probe_interfaces true|false
+#
+# By default, sudo will probe the system's network interfaces and
+# pass the IP address of each enabled interface to the policy plugin.
+# On systems with a large number of virtual interfaces this may take
+# a noticeable amount of time.
+#
+#Set probe_interfaces false
+
+#
+# Sudo debug files:
+#   Debug program /path/to/debug_log subsystem@priority[,subsyste@priority]
+#
+# Sudo and related programs support logging debug information to a file.
+# The program is typically sudo, sudoers.so, sudoreplay, or visudo.
+#
+# Subsystems vary based on the program; "all" matches all subsystems.
+# Priority may be crit, err, warn, notice, diag, info, trace, or debug.
+# Multiple subsystem@priority may be specified, separated by a comma.
+#
+#Debug sudo /var/log/sudo_debug all@debug
+#Debug sudoers.so /var/log/sudoers_debug all@debug
+## sudoers file.
+##
+## This file MUST be edited with the 'visudo' command as root.
+## Failure to use 'visudo' may result in syntax or file permission errors
+## that prevent sudo from running.
+##
+## See the sudoers man page for the details on how to write a sudoers file.
+##
+
+##
+## Host alias specification
+##
+## Groups of machines. These may include host names (optionally with wildcards),
+## IP addresses, network numbers or netgroups.
+# Host_Alias	WEBSERVERS = www1, www2, www3
+
+##
+## User alias specification
+##
+## Groups of users.  These may consist of user names, uids, Unix groups,
+## or netgroups.
+# User_Alias	ADMINS = millert, dowdy, mikef
+User_Alias	WHEEL_USERS = %wheel
+User_Alias	XGRP_USERS = %xgrp
+# User_Alias	SUDO_USERS = %sudo
+
+##
+## Cmnd alias specification
+##
+## Groups of commands.  Often used to group related commands together.
+# Cmnd_Alias	PROCESSES = /usr/bin/nice, /bin/kill, /usr/bin/renice, \
+# 			    /usr/bin/pkill, /usr/bin/top
+#
+# Cmnd_Alias	REBOOT = /sbin/halt, /sbin/reboot, /sbin/poweroff
+#
+# Cmnd_Alias	DEBUGGERS = /usr/bin/gdb, /usr/bin/lldb, /usr/bin/strace, \
+# 			    /usr/bin/truss, /usr/bin/bpftrace, \
+# 			    /usr/bin/dtrace, /usr/bin/dtruss
+#
+# Cmnd_Alias	PKGMAN = /usr/bin/apt, /usr/bin/dpkg, /usr/bin/rpm, \
+# 			 /usr/bin/yum, /usr/bin/dnf,  /usr/bin/zypper, \
+# 			 /usr/bin/pacman
+
+##
+## Defaults specification
+##
+## Preserve editor environment variables for visudo.
+## To preserve these for all commands, remove the "!visudo" qualifier.
+Defaults!/usr/sbin/visudo env_keep += "SUDO_EDITOR EDITOR VISUAL"
+##
+## Use a hard-coded PATH instead of the user's to find commands.
+## This also helps prevent poorly written scripts from running
+## arbitrary commands under sudo.
+Defaults secure_path="/sbin:/usr/sbin:/usr/local/sbin:/bin:/usr/bin:/usr/local/bin"
+##
+## You may wish to keep some of the following environment variables
+## when running commands via sudo.
+##
+## Locale settings
+# Defaults env_keep += "LANG LANGUAGE LINGUAS LC_* _XKB_CHARSET"
+##
+## Run X applications through sudo; HOME is used to find the
+## .Xauthority file.  Note that other programs use HOME to find   
+## configuration files and this may lead to privilege escalation!
+# Defaults env_keep += "HOME"
+##
+## X11 resource path settings
+# Defaults env_keep += "XAPPLRESDIR XFILESEARCHPATH XUSERFILESEARCHPATH"
+##
+## Desktop path settings
+# Defaults env_keep += "QTDIR KDEDIR"
+##
+## Allow sudo-run commands to inherit the callers' ConsoleKit session
+# Defaults env_keep += "XDG_SESSION_COOKIE"
+##
+## Uncomment to enable special input methods.  Care should be taken as
+## this may allow users to subvert the command being run via sudo.
+# Defaults env_keep += "XMODIFIERS GTK_IM_MODULE QT_IM_MODULE QT_IM_SWITCHER"
+##
+## Uncomment to disable "use_pty" when running commands as root.
+## Commands run as non-root users will run in a pseudo-terminal,
+## not the user's own terminal, to prevent command injection.
+# Defaults>root !use_pty
+##
+## Uncomment to run commands in the background by default.
+## This can be used to prevent sudo from consuming user input while
+## a non-interactive command runs if "use_pty" or I/O logging are
+## enabled.  Some commands may not run properly in the background.
+# Defaults exec_background
+##
+## Uncomment to send mail if the user does not enter the correct password.
+# Defaults mail_badpass
+##
+## Uncomment to enable logging of a command's output, except for
+## sudoreplay and reboot.  Use sudoreplay to play back logged sessions.
+## Sudo will create up to 2,176,782,336 I/O logs before recycling them.
+## Set maxseq to a smaller number if you don't have unlimited disk space.
+# Defaults log_output
+# Defaults!/usr/bin/sudoreplay !log_output
+# Defaults!/usr/local/bin/sudoreplay !log_output
+# Defaults!REBOOT !log_output
+# Defaults maxseq = 1000
+##
+## Uncomment to disable intercept and log_subcmds for debuggers and
+## tracers.  Otherwise, anything that uses ptrace(2) will be unable
+## to run under sudo if intercept_type is set to "trace".
+# Defaults!DEBUGGERS !intercept, !log_subcmds
+##
+## Uncomment to disable intercept and log_subcmds for package managers.
+## Some package scripts run a huge number of commands, which is made
+## slower by these options and also can clutter up the logs.
+# Defaults!PKGMAN !intercept, !log_subcmds
+##
+## Uncomment to disable PAM silent mode.  Otherwise messages by PAM
+## modules such as pam_faillock will not be printed.
+# Defaults !pam_silent
+
+# If env_reset is disabled, sudo will NOT reset the environment
+# to only contain the fixed list of variables.
+# See sudoers(5) for details.
+#Defaults:WHEEL_USERS !env_reset
+
+# Preserve DISPLAY and XAUTHORITY environment variables
+# for "xgrp" group members.
+Defaults:XGRP_USERS env_keep += "DISPLAY XAUTHORITY"
+
+##
+## Runas alias specification
+##
+
+##
+## User privilege specification
+##
+# root ALL=(ALL:ALL) ALL
+
+## Uncomment to allow members of group wheel to execute any command
+# WHEEL_USERS ALL=(ALL:ALL) ALL
+
+## Same thing without a password
+# WHEEL_USERS ALL=(ALL:ALL) NOPASSWD: ALL
+
+## Uncomment to allow members of group sudo to execute any command
+# SUDO_USERS	ALL=(ALL:ALL) ALL
+
+## Uncomment to allow any user to run sudo if they know the password
+## of the user they are running the command as (root by default).
+# Defaults targetpw  # Ask for the password of the target user
+# ALL ALL=(ALL:ALL) ALL  # WARNING: only use this together with 'Defaults targetpw'
+
+## Read drop-in files from /etc/sudoers.d
+@includedir /etc/sudoers.d
+# sysctl settings are defined through files in
+# /usr/lib/sysctl.d/, /run/sysctl.d/, and /etc/sysctl.d/.
+#
+# Vendors settings live in /usr/lib/sysctl.d/.
+# To override a whole file, create a new file with the same in
+# /etc/sysctl.d/ and put new settings there. To override
+# only specific settings, add a file with a lexically later
+# name in /etc/sysctl.d/ and put new settings there.
+#
+# For more information, see sysctl.conf(5) and sysctl.d(5).
+net.ipv4.ip_forward=1
+ALT Server 11.0 (Mendelevium)
+PRUNE_BIND_MOUNTS = "yes"
+PRUNEFS = "9p afs anon_inodefs auto autofs bdev binfmt_misc cgroup cifs coda configfs cpuset debugfs devpts ecryptfs exofs fuse fusectl gfs gfs2 hugetlbfs inotifyfs iso9660 jffs2 lustre mqueue ncpfs nfs nfs4 nfsd pipefs proc ramfs rootfs rpc_pipefs securityfs selinuxfs sfs sockfs sysfs tmpfs ubifs udf usbfs"
+PRUNENAMES = ".git .hg .svn"
+PRUNEPATHS = "/afs /media /net /sfs /tmp /udev /var/cache/ccache /var/spool/cups /var/spool/squid /var/tmp"
+FONT=UniCyr_8x16
+KEYMAP=ruwin-Corwin_alt_sh-UTF-8
+###
+### Sample Wget initialization file .wgetrc
+###
+
+## You can use this file to change the default behaviour of wget or to
+## avoid having to type many many command-line options. This file does
+## not contain a comprehensive list of commands -- look at the manual
+## to find out what you can put into this file. You can find this here:
+##   $ info wget.info 'Startup File'
+## Or online here:
+##   https://www.gnu.org/software/wget/manual/wget.html#Startup-File
+##
+## Wget initialization file can reside in /etc/wgetrc
+## (global, for all users) or $HOME/.wgetrc (for a single user).
+##
+## To use the settings in this file, you will have to uncomment them,
+## as well as change them, in most cases, as the values on the
+## commented-out lines are the default values (e.g. "off").
+##
+## Command are case-, underscore- and minus-insensitive.
+## For example ftp_proxy, ftp-proxy and ftpproxy are the same.
+
+
+##
+## Global settings (useful for setting up in /etc/wgetrc).
+## Think well before you change them, since they may reduce wget's
+## functionality, and make it behave contrary to the documentation:
+##
+
+# You can set retrieve quota for beginners by specifying a value
+# optionally followed by 'K' (kilobytes) or 'M' (megabytes).  The
+# default quota is unlimited.
+#quota = inf
+
+# You can lower (or raise) the default number of retries when
+# downloading a file (default is 20).
+#tries = 20
+
+# Lowering the maximum depth of the recursive retrieval is handy to
+# prevent newbies from going too "deep" when they unwittingly start
+# the recursive retrieval.  The default is 5.
+#reclevel = 5
+
+# By default Wget uses "passive FTP" transfer where the client
+# initiates the data connection to the server rather than the other
+# way around.  That is required on systems behind NAT where the client
+# computer cannot be easily reached from the Internet.  However, some
+# firewalls software explicitly supports active FTP and in fact has
+# problems supporting passive transfer.  If you are in such
+# environment, use "passive_ftp = off" to revert to active FTP.
+#passive_ftp = off
+
+# The "wait" command below makes Wget wait between every connection.
+# If, instead, you want Wget to wait only between retries of failed
+# downloads, set waitretry to maximum number of seconds to wait (Wget
+# will use "linear backoff", waiting 1 second after the first failure
+# on a file, 2 seconds after the second failure, etc. up to this max).
+#waitretry = 10
+
+
+##
+## Local settings (for a user to set in his $HOME/.wgetrc).  It is
+## *highly* undesirable to put these settings in the global file, since
+## they are potentially dangerous to "normal" users.
+##
+## Even when setting up your own ~/.wgetrc, you should know what you
+## are doing before doing so.
+##
+
+# Set this to on to use timestamping by default:
+#timestamping = off
+
+# It is a good idea to make Wget send your email address in a `From:'
+# header with your request (so that server administrators can contact
+# you in case of errors).  Wget does *not* send `From:' by default.
+#header = From: Your Name <username@site.domain>
+
+# You can set up other headers, like Accept-Language.  Accept-Language
+# is *not* sent by default.
+#header = Accept-Language: en
+
+# You can set the default proxies for Wget to use for http, https, and ftp.
+# They will override the value in the environment.
+#https_proxy = http://proxy.yoyodyne.com:18023/
+#http_proxy = http://proxy.yoyodyne.com:18023/
+#ftp_proxy = http://proxy.yoyodyne.com:18023/
+
+# If you do not want to use proxy at all, set this to off.
+#use_proxy = on
+
+# You can customize the retrieval outlook.  Valid options are default,
+# binary, mega and micro.
+#dot_style = default
+
+# Setting this to off makes Wget not download /robots.txt.  Be sure to
+# know *exactly* what /robots.txt is and how it is used before changing
+# the default!
+#robots = on
+
+# It can be useful to make Wget wait between connections.  Set this to
+# the number of seconds you want Wget to wait.
+#wait = 0
+
+# You can force creating directory structure, even if a single is being
+# retrieved, by setting this to on.
+#dirstruct = off
+
+# You can turn on recursive retrieving by default (don't do this if
+# you are not sure you know what it means) by setting this to on.
+#recursive = off
+
+# To always back up file X as X.orig before converting its links (due
+# to -k / --convert-links / convert_links = on having been specified),
+# set this variable to on:
+#backup_converted = off
+
+# To have Wget follow FTP links from HTML files by default, set this
+# to on:
+#follow_ftp = off
+
+# To try ipv6 addresses first:
+#prefer-family = IPv6
+
+# Set default IRI support state
+#iri = off
+
+# Force the default system encoding
+#localencoding = UTF-8
+
+# Force the default remote server encoding
+#remoteencoding = UTF-8
+
+# Turn on to prevent following non-HTTPS links when in recursive mode
+#httpsonly = off
+
+# Tune HTTPS security (auto, SSLv2, SSLv3, TLSv1, PFS)
+#secureprotocol = auto
+# whois configuration file
+#
+# This file can contain details of alternative whois servers to use if
+# the compiled in servers are not suitable.  Each entry is a single
+# text line and consists of a regular expression pattern to match and
+# the whois server to be used for it, separated by blank space.
+# IDN domains must use the ACE format.
+#
+# Eg:
+# \.nz$ nz.whois-servers.net
+#
+# /etc/xattr.conf
+#
+# Format:
+# <pattern> <action>
+#
+# Actions:
+#   permissions - copy when trying to preserve permissions.
+#   skip - do not copy.
+#
+# Note that libattr functions attr_copy_file() and attr_copy_fd() by default
+# skip all extended attributes that are matched by any of the below patterns,
+# regardless of the specified action.
+
+system.posix_acl_access		permissions
+system.posix_acl_default	permissions
+trusted.SGI_ACL_DEFAULT		skip		# xfs specific
+trusted.SGI_ACL_FILE		skip		# xfs specific
+trusted.SGI_CAP_FILE		skip		# xfs specific
+trusted.SGI_DMI_*		skip		# xfs specific
+trusted.SGI_MAC_FILE		skip		# xfs specific
+xfsroot.*			skip		# xfs specific; obsolete
+user.Beagle.*			skip		# ignore Beagle index data
+security.evm			skip		# may only be written by kernel
+afs.*				skip		# AFS metadata and ACLs
